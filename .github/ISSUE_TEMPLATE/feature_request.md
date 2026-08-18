@@ -1,11 +1,8 @@
-markdown
----
 name: Feature Request
 about: Suggest an idea or improvement
 title: "[FEATURE] "
 labels: enhancement
 assignees: ""
----
 
 ## Problem
 
@@ -18,4 +15,3 @@ assignees: ""
 ## Alternatives Considered
 
 <!-- Describe any alternative solutions or features you considered. -->
-```
