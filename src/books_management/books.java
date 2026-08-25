@@ -48,23 +48,23 @@ public class books {
 
     public static boolean issueBook(int bookId, String memberName) {
 
-    for (books book : libraryBooks) {
+        for (books book : libraryBooks) {
 
-        if (book.getBook_Id() == bookId) {
+            if (book.getBook_Id() == bookId) {
 
-            if (book.getBook_Quantity() <= 0) {
-                return false;
+                if (book.getBook_Quantity() <= 0) {
+                    return false;
+                }
+
+                book.setBook_Quantity(book.getBook_Quantity() - 1);
+                issuedBooks.add(bookId + ":" + memberName);
+
+                return true;
             }
-
-            book.setBook_Quantity(book.getBook_Quantity() - 1);
-            issuedBooks.add(bookId + ":" + memberName);
-
-            return true;
         }
-    }
 
-    return false;
-}
+        return false;
+    }
 
     public static boolean returnBook(int bookId, String memberName) {
 
