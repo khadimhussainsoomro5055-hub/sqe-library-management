@@ -52,7 +52,11 @@ public class books {
 
             if (book.getBook_Id() == bookId) {
 
-                book.book_Quantity--;
+                if (book.getBook_Quantity() <= 0) {
+                    return false;
+                }
+
+                book.setBook_Quantity(book.getBook_Quantity() - 1);
                 issuedBooks.add(bookId + ":" + memberName);
 
                 return true;
