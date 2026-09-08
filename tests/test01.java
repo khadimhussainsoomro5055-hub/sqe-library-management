@@ -234,53 +234,32 @@ public class test01 {
     }
 
     private static void testBorrowingLimit() {
-
         books.clearLibrary();
 
-        books book1 = new books(
-            201,
-            "Book One",
-            "Author One",
-            2
-        );
-
-        books book2 = new books(
-            202,
-            "Book Two",
-            "Author Two",
-            2
-        );
-
-        books book3 = new books(
-            203,
-            "Book Three",
-            "Author Three",
-            2
-        );
-
-        books book4 = new books(
-            204,
-            "Book Four",
-            "Author Four",
-            2
-        );
+        books book1 = new books(201, "Book One", "Author One", 2);
+        books book2 = new books(202, "Book Two", "Author Two", 2);
+        books book3 = new books(203, "Book Three", "Author Three", 2);
+        books book4 = new books(204, "Book Four", "Author Four", 2);
+        books book5 = new books(205, "Book Five", "Author Five", 2);
+        books book6 = new books(206, "Book Six", "Author Six", 2);
 
         books.addBook(book1);
         books.addBook(book2);
         books.addBook(book3);
         books.addBook(book4);
+        books.addBook(book5);
+        books.addBook(book6);
 
         boolean first = books.issueBook(201, "Ali");
         boolean second = books.issueBook(202, "Ali");
         boolean third = books.issueBook(203, "Ali");
         boolean fourth = books.issueBook(204, "Ali");
+        boolean fifth = books.issueBook(205, "Ali");
+        boolean sixth = books.issueBook(206, "Ali");
 
         check(
             "Enforce member borrowing limit",
-            first &&
-            second &&
-            third &&
-            !fourth
+            first && second && third && fourth && fifth && !sixth
         );
     }
 

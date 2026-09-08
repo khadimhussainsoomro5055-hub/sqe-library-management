@@ -12,7 +12,7 @@ public class books {
     private static List<String> issuedBooks = new ArrayList<>();
 
     // Maximum number of books one member can borrow
-    private static final int MAX_BORROW_LIMIT = 3;
+    private static final int MAX_BORROW_LIMIT = 5;
 
     // Fine rates
     private static final int FINE_RATE_FIRST_TIER = 20;
@@ -218,6 +218,44 @@ public class books {
         }
 
         return overdueDays * FINE_RATE_THIRD_TIER;
+    }
+
+    // Return fine tier based on overdue days
+    public static String fineTier(int overdueDays) {
+
+        if (overdueDays < 0) {
+            throw new IllegalArgumentException(
+                "Overdue days cannot be negative."
+            );
+        }
+
+        if (overdueDays == 0) {
+            return "None";
+        }
+
+        if (overdueDays <= 7) {
+            return "Low";
+        }
+
+        if (overdueDays <= 14) {
+            return "Medium";
+        }
+
+        if (overdueDays <= 30) {
+            return "High";
+        }
+
+        return "Severe";
+    }
+
+    // Validate ISBN - exactly 13 numeric digits
+    public static boolean validateISBN(String isbn) {
+
+        if (isbn == null) {
+            return false;
+        }
+
+        return isbn.matches("\\d{13}");
     }
 
     // Display all books
