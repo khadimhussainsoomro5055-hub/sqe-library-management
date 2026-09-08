@@ -91,3 +91,47 @@ A representative value from each equivalence class will be used for automated JU
 Equivalence Partitioning does not focus on the exact boundaries between classes. Therefore, it can miss errors that occur at boundary values, such as 7 and 8 overdue days or 30 and 31 overdue days.
 
 Boundary Value Analysis is needed to specifically test these edges. The next lab uses Boundary Value Analysis to address this limitation.
+
+## 7. JUnit Test Execution Results
+
+The EP test cases were implemented using JUnit because the Library Management System is a Java project.
+
+### Fine Tier Tests
+
+- Test class: `FineTierTest`
+- Tests found: 6
+- Tests successful: 6
+- Tests failed: 0
+
+Result: **PASS**
+
+### Borrowing Limit Tests
+
+- Test class: `BorrowLimitTest`
+- Tests found: 2
+- Tests successful: 2
+- Tests failed: 0
+
+Result: **PASS**
+
+### ISBN Validation Tests
+
+- Test class: `ISBNValidationTest`
+- Tests found: 6
+- Tests successful: 6
+- Tests failed: 0
+
+Result: **PASS**
+
+### Overall EP Testing Result
+
+All implemented Equivalence Partitioning tests passed successfully.
+
+| Test Class | Tests | Passed | Failed |
+|---|---:|---:|---:|
+| FineTierTest | 6 | 6 | 0 |
+| BorrowLimitTest | 2 | 2 | 0 |
+| ISBNValidationTest | 6 | 6 | 0 |
+| **Total** | **14** | **14** | **0** |
+
+The test suite demonstrates that the selected representative values from the equivalence classes produce the expected results.
