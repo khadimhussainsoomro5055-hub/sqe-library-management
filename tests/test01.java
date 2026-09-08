@@ -48,6 +48,7 @@ public class test01 {
         );
     }
 
+    // Regression test for Issue #5: Duplicate book IDs are allowed
     private static void testDuplicateBookId() {
 
         books.clearLibrary();
@@ -76,6 +77,7 @@ public class test01 {
         );
     }
 
+    // Regression test for Issue #4: Negative book quantity is accepted
     private static void testNegativeQuantity() {
 
         books.clearLibrary();
