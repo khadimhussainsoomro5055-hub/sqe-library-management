@@ -22,4 +22,4 @@ The system shall allow an issued book to be returned.
 The system shall allow users to search for a book by its name.
 
 ## REQ-8
-The system shall display the book ID, name, author, and available quantity.
+The system shall enforce the member borrowing limit and calculate fines for overdue books.
