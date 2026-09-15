@@ -58,4 +58,37 @@ public class BorrowLimitTest {
         // Sixth book must be rejected
         assertFalse(books.issueBook(406, "Ali"));
     }
+    @Test
+    void testBorrowingLimitBoundary() {
+
+        books.clearLibrary();
+
+        // Create 6 available books
+        for (int i = 1; i <= 6; i++) {
+            books.addBook(
+                new books(
+                    500 + i,
+                    "BVA Book " + i,
+                    "Author " + i,
+                    1
+                )
+            );
+        }
+
+        // Boundary: member currently has 4 books
+        assertTrue(books.issueBook(501, "Ahmed"));
+        assertTrue(books.issueBook(502, "Ahmed"));
+        assertTrue(books.issueBook(503, "Ahmed"));
+        assertTrue(books.issueBook(504, "Ahmed"));
+
+        // 4 → 5 : allowed
+        assertTrue(
+            books.issueBook(505, "Ahmed")
+        );
+
+        // 5 → 6 : rejected
+        assertFalse(
+            books.issueBook(506, "Ahmed")
+        );
+    }
 }

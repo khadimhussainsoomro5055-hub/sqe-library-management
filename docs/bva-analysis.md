@@ -71,4 +71,52 @@ The selected boundary values are:
 ```text
 11, 12, 13, 14, 15
 ```
+## 5. BVA Test Execution Results
 
+Boundary Value Analysis tests were implemented using JUnit for the Java Library Management System.
+
+### Fine-Tier BVA
+
+- Test class: `FineTierBVATest`
+- Tests found: 15
+- Tests successful: 15
+- Tests failed: 0
+
+Result: **PASS**
+
+The tests covered the fine-tier boundaries at 0, 1, 7, 8, 14, 15, 30, and 31, including the invalid boundary value -1.
+
+### Borrowing-Limit BVA
+
+- Test class: `BorrowLimitTest`
+- Tests found: 3
+- Tests successful: 3
+- Tests failed: 0
+
+Result: **PASS**
+
+The boundary behavior was verified by testing the transition from 4 to 5 books and attempting to exceed the maximum limit from 5 to 6 books.
+
+### ISBN-Length BVA
+
+- Test class: `ISBNValidationTest`
+- Tests found: 11
+- Tests successful: 11
+- Tests failed: 0
+
+Result: **PASS**
+
+ISBN lengths of 11, 12, 13, 14, and 15 digits were tested. Only exactly 13 numeric digits were accepted.
+
+## 6. Overall BVA Result
+
+| Test Area | Tests | Passed | Failed |
+|---|---:|---:|---:|
+| Fine-Tier BVA | 15 | 15 | 0 |
+| Borrowing-Limit BVA | 3 | 3 | 0 |
+| ISBN-Length BVA | 11 | 11 | 0 |
+| **Total** | **29** | **29** | **0** |
+
+The combined Boundary Value Analysis tests completed successfully with **29 tests passed and 0 tests failed**.
+
+No boundary defect was identified in the tested fine-tier, borrowing-limit, or ISBN-length behavior.
