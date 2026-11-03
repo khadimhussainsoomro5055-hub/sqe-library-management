@@ -1,94 +1,41 @@
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
+
+import java.util.stream.Stream;
 
 public class BorrowLimitTest {
 
-    @Test
-    void testValidBorrowingClass() {
-
-        books.clearLibrary();
-
-        // Create 4 available books
-        for (int i = 1; i <= 4; i++) {
-            books.addBook(
-                new books(
-                    300 + i,
-                    "Book " + i,
-                    "Author " + i,
-                    1
-                )
-            );
-        }
-
-        // Member currently has 3 books
-        assertTrue(books.issueBook(301, "Ali"));
-        assertTrue(books.issueBook(302, "Ali"));
-        assertTrue(books.issueBook(303, "Ali"));
-
-        // Fourth book is still allowed because the limit is 5
-        assertTrue(books.issueBook(304, "Ali"));
+    @BeforeEach
+    void setUp() {
+        LibraryTestFixture.prepareBorrowingCatalog();
     }
 
-    @Test
-    void testInvalidBorrowingClass() {
-
-        books.clearLibrary();
-
-        // Create 6 available books
-        for (int i = 1; i <= 6; i++) {
-            books.addBook(
-                new books(
-                    400 + i,
-                    "Book " + i,
-                    "Author " + i,
-                    1
-                )
-            );
-        }
-
-        // Member borrows 5 books
-        assertTrue(books.issueBook(401, "Ali"));
-        assertTrue(books.issueBook(402, "Ali"));
-        assertTrue(books.issueBook(403, "Ali"));
-        assertTrue(books.issueBook(404, "Ali"));
-        assertTrue(books.issueBook(405, "Ali"));
-
-        // Sixth book must be rejected
-        assertFalse(books.issueBook(406, "Ali"));
+    static Stream<Arguments> borrowingCases() {
+        return Stream.of(
+            Arguments.of(0, true, "zero books"),
+            Arguments.of(1, true, "one book"),
+            Arguments.of(2, true, "two books"),
+            Arguments.of(3, true, "three books"),
+            Arguments.of(4, true, "four books"),
+            Arguments.of(5, false, "five books")
+        );
     }
-    @Test
-    void testBorrowingLimitBoundary() {
 
-        books.clearLibrary();
+    @ParameterizedTest(name = "Borrowing with {2} already borrowed")
+    @MethodSource("borrowingCases")
+    void testBorrowingLimit(int currentBorrowed, boolean expected, String testCase) {
 
-        // Create 6 available books
-        for (int i = 1; i <= 6; i++) {
-            books.addBook(
-                new books(
-                    500 + i,
-                    "BVA Book " + i,
-                    "Author " + i,
-                    1
-                )
-            );
+        for (int i = 0; i < currentBorrowed; i++) {
+            assertTrue(books.issueBook(501 + i, "Ali"));
         }
 
-        // Boundary: member currently has 4 books
-        assertTrue(books.issueBook(501, "Ahmed"));
-        assertTrue(books.issueBook(502, "Ahmed"));
-        assertTrue(books.issueBook(503, "Ahmed"));
-        assertTrue(books.issueBook(504, "Ahmed"));
+        boolean result = books.issueBook(501 + currentBorrowed, "Ali");
 
-        // 4 → 5 : allowed
-        assertTrue(
-            books.issueBook(505, "Ahmed")
-        );
-
-        // 5 → 6 : rejected
-        assertFalse(
-            books.issueBook(506, "Ahmed")
-        );
+        assertEquals(expected, result);
     }
 }

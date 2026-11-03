@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -272,9 +275,49 @@ public class books {
         }
     }
 
-    // Clear data - useful for testing
-    public static void clearLibrary() {
-        libraryBooks.clear();
-        issuedBooks.clear();
+    // Calculate the total number of available copies across all books
+    public static int totalAvailableCopies() {
+        int total = 0;
+
+        for (books book : libraryBooks) {
+            total += book.getBook_Quantity();
+        }
+
+        return total;
+    }
+
+    // Export the catalog using an injectable writer for easy unit testing.
+    public static void exportCatalog(String path, CatalogWriter writer) {
+        StringBuilder content = new StringBuilder();
+
+        for (books book : libraryBooks) {
+            content.append("ID: ")
+                   .append(book.getBook_Id())
+                   .append(", Name: ")
+                   .append(book.getBook_Name())
+                   .append(", Author: ")
+                   .append(book.getBook_Author())
+                   .append(", Quantity: ")
+                   .append(book.getBook_Quantity())
+                   .append(System.lineSeparator());
+            }
+
+            try {
+                writer.write(path, content.toString());
+            } catch (IOException e) {
+                throw new LibraryIOError("Failed to export library catalog.", e);
+            }
+        }
+
+        // Clear data - useful for testing
+        public static void clearLibrary() {
+            libraryBooks.clear();
+            issuedBooks.clear();
+        }
+
+        public static void exportCatalog(String path) {
+        exportCatalog(path, (filePath, content) ->
+            Files.writeString(Path.of(filePath), content)
+        );
     }
 }

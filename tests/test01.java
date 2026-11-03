@@ -31,7 +31,7 @@ public class test01 {
 
     private static void testAddValidBook() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         books book = new books(
             101,
@@ -51,7 +51,7 @@ public class test01 {
     // Regression test for Issue #5: Duplicate book IDs are allowed
     private static void testDuplicateBookId() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         books book1 = new books(
             101,
@@ -80,7 +80,7 @@ public class test01 {
     // Regression test for Issue #4: Negative book quantity is accepted
     private static void testNegativeQuantity() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         boolean rejected = false;
 
@@ -108,7 +108,7 @@ public class test01 {
 
     private static void testIssueAvailableBook() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         books book = new books(
             101,
@@ -132,7 +132,7 @@ public class test01 {
 
     private static void testIssueUnavailableBook() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         books book = new books(
             102,
@@ -157,7 +157,7 @@ public class test01 {
 
     private static void testReturnBook() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         books book = new books(
             103,
@@ -187,7 +187,7 @@ public class test01 {
 
     private static void testInvalidReturn() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         books book = new books(
             104,
@@ -211,7 +211,7 @@ public class test01 {
 
     private static void testSearchBook() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         books book = new books(
             105,
@@ -234,7 +234,7 @@ public class test01 {
     }
 
     private static void testBorrowingLimit() {
-        books.clearLibrary();
+        resetLibrary();
 
         books book1 = new books(201, "Book One", "Author One", 2);
         books book2 = new books(202, "Book Two", "Author Two", 2);
@@ -265,7 +265,7 @@ public class test01 {
 
     private static void testFineCalculation() {
 
-        books.clearLibrary();
+        resetLibrary();
 
         int zeroDays = books.calculateFine(0);
         int fiveDays = books.calculateFine(5);
@@ -277,6 +277,10 @@ public class test01 {
             fiveDays > 0 &&
             eightDays > fiveDays
         );
+    }
+
+    private static void resetLibrary() {
+    books.clearLibrary();
     }
 
     private static void check(
