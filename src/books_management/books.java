@@ -1,8 +1,12 @@
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class books {
 
@@ -14,6 +18,10 @@ public class books {
     private static List<books> libraryBooks = new ArrayList<>();
     private static List<String> issuedBooks = new ArrayList<>();
 
+    // Track total times each book has been borrowed
+    private static Map<Integer, Integer> borrowingCounts =
+            new HashMap<>();
+
     // Maximum number of books one member can borrow
     private static final int MAX_BORROW_LIMIT = 5;
 
@@ -22,10 +30,13 @@ public class books {
     private static final int FINE_RATE_SECOND_TIER = 50;
     private static final int FINE_RATE_THIRD_TIER = 100;
 
-    public books(int book_Id, String book_Name, String book_Author, int book_Quantity) {
+    public books(int book_Id, String book_Name,
+                 String book_Author, int book_Quantity) {
 
         if (book_Quantity < 0) {
-            throw new IllegalArgumentException("Book quantity cannot be negative.");
+            throw new IllegalArgumentException(
+                    "Book quantity cannot be negative."
+            );
         }
 
         this.book_Id = book_Id;
@@ -54,7 +65,7 @@ public class books {
 
         if (book_Quantity < 0) {
             throw new IllegalArgumentException(
-                "Book quantity cannot be negative."
+                    "Book quantity cannot be negative."
             );
         }
 
@@ -110,13 +121,20 @@ public class books {
                     return false;
                 }
 
-                // Issue book
+                // Decrease available quantity
                 book.setBook_Quantity(
-                    book.getBook_Quantity() - 1
+                        book.getBook_Quantity() - 1
                 );
 
+                // Store current borrowing record
                 issuedBooks.add(
-                    bookId + ":" + memberName
+                        bookId + ":" + memberName
+                );
+
+                // Increase total borrowing count
+                borrowingCounts.put(
+                        bookId,
+                        borrowingCounts.getOrDefault(bookId, 0) + 1
                 );
 
                 return true;
@@ -142,12 +160,15 @@ public class books {
                 if (book.getBook_Id() == bookId) {
 
                     book.setBook_Quantity(
-                        book.getBook_Quantity() + 1
+                            book.getBook_Quantity() + 1
                     );
 
                     break;
                 }
             }
+
+            // Do not decrease borrowingCounts.
+            // It stores lifetime borrowing totals.
 
             return true;
         }
@@ -184,7 +205,7 @@ public class books {
             String[] parts = record.split(":", 2);
 
             if (parts.length == 2 &&
-                parts[1].equals(memberName)) {
+                    parts[1].equals(memberName)) {
 
                 count++;
             }
@@ -228,7 +249,7 @@ public class books {
 
         if (overdueDays < 0) {
             throw new IllegalArgumentException(
-                "Overdue days cannot be negative."
+                    "Overdue days cannot be negative."
             );
         }
 
@@ -267,16 +288,17 @@ public class books {
         for (books book : libraryBooks) {
 
             System.out.println(
-                "ID: " + book.getBook_Id()
-                + ", Name: " + book.getBook_Name()
-                + ", Author: " + book.getBook_Author()
-                + ", Quantity: " + book.getBook_Quantity()
+                    "ID: " + book.getBook_Id()
+                    + ", Name: " + book.getBook_Name()
+                    + ", Author: " + book.getBook_Author()
+                    + ", Quantity: " + book.getBook_Quantity()
             );
         }
     }
 
-    // Calculate the total number of available copies across all books
+    // Calculate total available copies
     public static int totalAvailableCopies() {
+
         int total = 0;
 
         for (books book : libraryBooks) {
@@ -286,42 +308,67 @@ public class books {
         return total;
     }
 
+    // Rank books by popularity
     public static List<books> rankBooksByPopularity() {
-        return new ArrayList<>(libraryBooks);
+
+        List<books> rankedBooks = new ArrayList<>(libraryBooks);
+
+        rankedBooks.sort(
+                Comparator
+                        .comparingInt(
+                                (books book) -> borrowingCounts.getOrDefault(
+                                        book.getBook_Id(), 0
+                                )
+                        )
+                        .reversed()
+                        .thenComparing(books::getBook_Name,
+                                String.CASE_INSENSITIVE_ORDER)
+        );
+
+        return rankedBooks;
     }
 
-    // Export the catalog using an injectable writer for easy unit testing.
+    // Export the catalog using an injectable writer
     public static void exportCatalog(String path, CatalogWriter writer) {
+
         StringBuilder content = new StringBuilder();
 
         for (books book : libraryBooks) {
+
             content.append("ID: ")
-                   .append(book.getBook_Id())
-                   .append(", Name: ")
-                   .append(book.getBook_Name())
-                   .append(", Author: ")
-                   .append(book.getBook_Author())
-                   .append(", Quantity: ")
-                   .append(book.getBook_Quantity())
-                   .append(System.lineSeparator());
-            }
-
-            try {
-                writer.write(path, content.toString());
-            } catch (IOException e) {
-                throw new LibraryIOError("Failed to export library catalog.", e);
-            }
+                    .append(book.getBook_Id())
+                    .append(", Name: ")
+                    .append(book.getBook_Name())
+                    .append(", Author: ")
+                    .append(book.getBook_Author())
+                    .append(", Quantity: ")
+                    .append(book.getBook_Quantity())
+                    .append(System.lineSeparator());
         }
 
-        // Clear data - useful for testing
-        public static void clearLibrary() {
-            libraryBooks.clear();
-            issuedBooks.clear();
-        }
+        try {
+            writer.write(path, content.toString());
 
-        public static void exportCatalog(String path) {
+        } catch (IOException e) {
+
+            throw new LibraryIOError(
+                    "Failed to export library catalog.", e
+            );
+        }
+    }
+
+    // Clear data - useful for testing
+    public static void clearLibrary() {
+
+        libraryBooks.clear();
+        issuedBooks.clear();
+        borrowingCounts.clear();
+    }
+
+    public static void exportCatalog(String path) {
+
         exportCatalog(path, (filePath, content) ->
-            Files.writeString(Path.of(filePath), content)
+                Files.writeString(Path.of(filePath), content)
         );
     }
 }
