@@ -1,0 +1,125 @@
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class RankBooksByPopularityTest {
+
+    @BeforeEach
+    void setUp() {
+        LibraryTestFixture.resetLibrary();
+    }
+
+    @Test
+    void testRankBooksEmptyCatalogReturnsEmptyList() {
+        List<books> result = books.rankBooksByPopularity();
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testRankBooksSingleBookReturnsThatBook() {
+        LibraryTestFixture.addBook(
+                201, "Java Programming", "James Gosling", 5
+        );
+
+        List<books> result = books.rankBooksByPopularity();
+
+        assertEquals(1, result.size());
+        assertEquals("Java Programming", result.get(0).getBook_Name());
+    }
+
+    @Test
+    void testRankBooksByPopularityDescending() {
+        LibraryTestFixture.addBook(
+                303, "Python Basics", "John Smith", 5
+        );
+
+        LibraryTestFixture.addBook(
+                301, "Java Programming", "James Gosling", 5
+        );
+
+        LibraryTestFixture.addBook(
+                302, "Clean Code", "Robert Martin", 5
+        );
+
+        books.issueBook(301, "Ali");
+        books.issueBook(301, "Ahmed");
+        books.issueBook(301, "Sara");
+
+        books.issueBook(302, "Ali");
+        books.issueBook(302, "Ahmed");
+
+        books.issueBook(303, "Ali");
+
+        List<books> result = books.rankBooksByPopularity();
+
+        assertEquals(3, result.size());
+        assertEquals("Java Programming", result.get(0).getBook_Name());
+        assertEquals("Clean Code", result.get(1).getBook_Name());
+        assertEquals("Python Basics", result.get(2).getBook_Name());
+    }
+
+    @Test
+    void testRankBooksWithEqualBorrowingCountsAlphabetically() {
+        LibraryTestFixture.addBook(
+                401, "Python Basics", "John Smith", 5
+        );
+
+        LibraryTestFixture.addBook(
+                402, "Clean Code", "Robert Martin", 5
+        );
+
+        books.issueBook(401, "Ali");
+        books.issueBook(401, "Ahmed");
+
+        books.issueBook(402, "Sara");
+        books.issueBook(402, "Usman");
+
+        List<books> result = books.rankBooksByPopularity();
+
+        assertEquals(2, result.size());
+        assertEquals("Clean Code", result.get(0).getBook_Name());
+        assertEquals("Python Basics", result.get(1).getBook_Name());
+    }
+
+    @Test
+    void testNeverBorrowedBooksAppearAfterBorrowedBooks() {
+        LibraryTestFixture.addBook(
+                501, "Python Basics", "John Smith", 5
+        );
+
+        LibraryTestFixture.addBook(
+                502, "Java Programming", "James Gosling", 5
+        );
+
+        LibraryTestFixture.addBook(
+                503, "Clean Code", "Robert Martin", 5
+        );
+
+        // Only Java Programming is borrowed.
+        books.issueBook(502, "Ali");
+        books.issueBook(502, "Ahmed");
+
+        List<books> result = books.rankBooksByPopularity();
+
+        assertEquals(3, result.size());
+
+        assertEquals(
+                "Java Programming",
+                result.get(0).getBook_Name()
+        );
+
+        assertEquals(
+                "Clean Code",
+                result.get(1).getBook_Name()
+        );
+
+        assertEquals(
+                "Python Basics",
+                result.get(2).getBook_Name()
+        );
+    }
+}
