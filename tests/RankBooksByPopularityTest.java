@@ -1,3 +1,4 @@
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
@@ -24,43 +25,63 @@ public class RankBooksByPopularityTest {
     void testRankBooksSingleBookReturnsThatBook() {
 
         LibraryTestFixture.addBook(
-            201, "Java Programming", "James Gosling", 5
+                201, "Java Programming", "James Gosling", 5
         );
 
         List<books> result = books.rankBooksByPopularity();
 
         assertEquals(1, result.size());
-        assertEquals("Java Programming", result.get(0).getBook_Name());
+        assertEquals(
+                "Java Programming",
+                result.get(0).getBook_Name()
+        );
     }
 
     @Test
     void testRankBooksByPopularityDescending() {
 
-       LibraryTestFixture.addBook(
-        303, "Python Basics", "John Smith", 5
+        // Add books in an order different from their popularity.
+        LibraryTestFixture.addBook(
+                303, "Python Basics", "John Smith", 5
         );
 
         LibraryTestFixture.addBook(
-        301, "Java Programming", "James Gosling", 5
+                301, "Java Programming", "James Gosling", 5
         );
 
         LibraryTestFixture.addBook(
-        302, "Clean Code", "Robert Martin", 5
+                302, "Clean Code", "Robert Martin", 5
         );
 
+        // Java Programming: 3 borrowings
         books.issueBook(301, "Ali");
         books.issueBook(301, "Ahmed");
         books.issueBook(301, "Sara");
 
+        // Clean Code: 2 borrowings
         books.issueBook(302, "Ali");
         books.issueBook(302, "Ahmed");
 
+        // Python Basics: 1 borrowing
         books.issueBook(303, "Ali");
 
         List<books> result = books.rankBooksByPopularity();
 
-        assertEquals("Java Programming", result.get(0).getBook_Name());
-        assertEquals("Clean Code", result.get(1).getBook_Name());
-        assertEquals("Python Basics", result.get(2).getBook_Name());
+        assertEquals(3, result.size());
+
+        assertEquals(
+                "Java Programming",
+                result.get(0).getBook_Name()
+        );
+
+        assertEquals(
+                "Clean Code",
+                result.get(1).getBook_Name()
+        );
+
+        assertEquals(
+                "Python Basics",
+                result.get(2).getBook_Name()
+        );
     }
 }
