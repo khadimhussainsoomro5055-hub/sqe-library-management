@@ -286,6 +286,11 @@ public class books {
         return total;
     }
 
+    // Rank books by popularity
+    public static List<books> rankBooksByPopularity() {
+        return new ArrayList<>();
+    }
+
     // Export the catalog using an injectable writer for easy unit testing.
     public static void exportCatalog(String path, CatalogWriter writer) {
         StringBuilder content = new StringBuilder();
