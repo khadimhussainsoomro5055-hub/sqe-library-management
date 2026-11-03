@@ -286,9 +286,8 @@ public class books {
         return total;
     }
 
-    // Rank books by popularity
     public static List<books> rankBooksByPopularity() {
-        return new ArrayList<>();
+        return new ArrayList<>(libraryBooks);
     }
 
     // Export the catalog using an injectable writer for easy unit testing.
