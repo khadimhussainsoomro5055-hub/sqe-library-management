@@ -32,4 +32,35 @@ public class RankBooksByPopularityTest {
         assertEquals(1, result.size());
         assertEquals("Java Programming", result.get(0).getBook_Name());
     }
+
+    @Test
+    void testRankBooksByPopularityDescending() {
+
+       LibraryTestFixture.addBook(
+        303, "Python Basics", "John Smith", 5
+        );
+
+        LibraryTestFixture.addBook(
+        301, "Java Programming", "James Gosling", 5
+        );
+
+        LibraryTestFixture.addBook(
+        302, "Clean Code", "Robert Martin", 5
+        );
+
+        books.issueBook(301, "Ali");
+        books.issueBook(301, "Ahmed");
+        books.issueBook(301, "Sara");
+
+        books.issueBook(302, "Ali");
+        books.issueBook(302, "Ahmed");
+
+        books.issueBook(303, "Ali");
+
+        List<books> result = books.rankBooksByPopularity();
+
+        assertEquals("Java Programming", result.get(0).getBook_Name());
+        assertEquals("Clean Code", result.get(1).getBook_Name());
+        assertEquals("Python Basics", result.get(2).getBook_Name());
+    }
 }
