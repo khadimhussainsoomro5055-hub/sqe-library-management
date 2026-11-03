@@ -19,4 +19,17 @@ public class RankBooksByPopularityTest {
 
         assertEquals(0, result.size());
     }
+
+    @Test
+    void testRankBooksSingleBookReturnsThatBook() {
+
+        LibraryTestFixture.addBook(
+            201, "Java Programming", "James Gosling", 5
+        );
+
+        List<books> result = books.rankBooksByPopularity();
+
+        assertEquals(1, result.size());
+        assertEquals("Java Programming", result.get(0).getBook_Name());
+    }
 }
