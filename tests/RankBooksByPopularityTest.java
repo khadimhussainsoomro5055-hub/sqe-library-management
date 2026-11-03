@@ -40,7 +40,6 @@ public class RankBooksByPopularityTest {
     @Test
     void testRankBooksByPopularityDescending() {
 
-        // Add books in an order different from their popularity.
         LibraryTestFixture.addBook(
                 303, "Python Basics", "John Smith", 5
         );
@@ -53,35 +52,48 @@ public class RankBooksByPopularityTest {
                 302, "Clean Code", "Robert Martin", 5
         );
 
-        // Java Programming: 3 borrowings
         books.issueBook(301, "Ali");
         books.issueBook(301, "Ahmed");
         books.issueBook(301, "Sara");
 
-        // Clean Code: 2 borrowings
         books.issueBook(302, "Ali");
         books.issueBook(302, "Ahmed");
 
-        // Python Basics: 1 borrowing
         books.issueBook(303, "Ali");
 
         List<books> result = books.rankBooksByPopularity();
 
         assertEquals(3, result.size());
 
-        assertEquals(
-                "Java Programming",
-                result.get(0).getBook_Name()
+        assertEquals("Java Programming", result.get(0).getBook_Name());
+        assertEquals("Clean Code", result.get(1).getBook_Name());
+        assertEquals("Python Basics", result.get(2).getBook_Name());
+    }
+
+    @Test
+    void testRankBooksWithEqualBorrowingCountsAlphabetically() {
+
+        // Add books in reverse alphabetical order.
+        LibraryTestFixture.addBook(
+                401, "Python Basics", "John Smith", 5
         );
 
-        assertEquals(
-                "Clean Code",
-                result.get(1).getBook_Name()
+        LibraryTestFixture.addBook(
+                402, "Clean Code", "Robert Martin", 5
         );
 
-        assertEquals(
-                "Python Basics",
-                result.get(2).getBook_Name()
-        );
+        // Both books are borrowed twice.
+        books.issueBook(401, "Ali");
+        books.issueBook(401, "Ahmed");
+
+        books.issueBook(402, "Sara");
+        books.issueBook(402, "Usman");
+
+        List<books> result = books.rankBooksByPopularity();
+
+        assertEquals(2, result.size());
+
+        assertEquals("Clean Code", result.get(0).getBook_Name());
+        assertEquals("Python Basics", result.get(1).getBook_Name());
     }
 }
