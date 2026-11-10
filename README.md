@@ -1,4 +1,8 @@
-# LibraryHub – Library Management System
+# SQE-Library_Management-System
+
+## Badges
+
+<!-- CI badge will be added in Lab 14 -->
 
 ## Project Overview
 
