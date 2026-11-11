@@ -23,5 +23,12 @@ public class MemberTest {
         double singleResult = Member.borrow_percentile(member1, singleMemberLibrary);
 
         System.out.println("Single-member percentile: " + singleResult);
+
+        try {
+            Member.borrow_percentile(member1, new ArrayList<>());
+            System.out.println("Empty library test failed!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Empty library test passed!");
+        }
     }
 }
