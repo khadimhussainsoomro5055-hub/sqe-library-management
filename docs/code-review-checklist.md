@@ -26,7 +26,6 @@
 - [ ] Could it negatively affect existing functionality?
 - [ ] Are there any performance concerns?
 
-
 ## 6. Code Review Retrospective
 
 ### What I learned
