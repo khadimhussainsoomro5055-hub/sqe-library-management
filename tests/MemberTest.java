@@ -18,7 +18,7 @@ public class MemberTest {
         // Test 1: Normal calculation
         double result = Member.borrow_percentile(member2, library);
 
-        if (Math.abs(result - 66.6666666667) > 0.0001) {
+        if (Math.abs(result - 50.0) > 0.0001) {
             throw new AssertionError("Normal calculation test failed!");
         }
 
@@ -37,7 +37,27 @@ public class MemberTest {
 
         System.out.println("Single-member test passed!");
 
-        // Test 3: Empty library
+        // Test 3: Lowest percentile
+        double lowestResult =
+            Member.borrow_percentile(member1, library);
+
+        if (lowestResult != 0.0) {
+            throw new AssertionError("Lowest percentile test failed!");
+        }
+
+        System.out.println("Lowest percentile test passed!");
+
+        // Test 4: Highest percentile
+        double highestResult =
+            Member.borrow_percentile(member3, library);
+
+        if (highestResult != 100.0) {
+            throw new AssertionError("Highest percentile test failed!");
+        }
+
+        System.out.println("Highest percentile test passed!");
+
+        // Test 5: Empty library
         try {
             Member.borrow_percentile(member1, new ArrayList<>());
             throw new AssertionError("Empty library test failed!");

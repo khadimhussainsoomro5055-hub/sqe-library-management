@@ -45,14 +45,18 @@ public class Member {
             );
         }
 
+        if (library.size() == 1) {
+            return 100.0;
+        }
+
         int rank = 0;
 
         for (Member m : library) {
-            if (m.getBorrowedBooks() <= member.getBorrowedBooks()) {
+            if (m.getBorrowedBooks() < member.getBorrowedBooks()) {
                 rank++;
             }
         }
 
-        return ((double) rank / library.size()) * 100;
+        return ((double) rank / (library.size() - 1)) * 100;
     }
 }

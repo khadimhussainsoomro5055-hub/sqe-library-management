@@ -45,3 +45,5 @@ I fixed the calculation, added empty-library validation, wrote JavaDoc documenta
 - Use assertions to verify expected results.
 - Write clear method documentation.
 - Review code for correctness, readability, design, and risk.
+- The correctness checklist item was the most valuable because it helped identify the incorrect percentile calculation.
+- In future reviews, I will add this checklist item: "Are percentile calculations tested for the lowest, middle, highest, and single-member cases?"
