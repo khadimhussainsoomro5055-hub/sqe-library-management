@@ -37,6 +37,6 @@ public class Member {
             }
         }
 
-        return (rank / library.size()) * 100;
+return ((double) rank / library.size()) * 100;
     }
 }
