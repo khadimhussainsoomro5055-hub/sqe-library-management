@@ -25,3 +25,23 @@
 - [ ] Could the change introduce security vulnerabilities?
 - [ ] Could it negatively affect existing functionality?
 - [ ] Are there any performance concerns?
+
+## 6. Code Review Retrospective
+
+### What I learned
+I learned that code review helps identify mistakes that may not be noticed during initial development. It also improves code quality, readability, and reliability.
+
+### Problems identified
+- Integer division caused incorrect percentile calculations.
+- Empty library input was not handled.
+- Tests printed results without checking expected values.
+- Method documentation was missing.
+
+### How the review improved the code
+I fixed the calculation, added empty-library validation, wrote JavaDoc documentation, and added assertions for normal, single-member, and empty-library cases.
+
+### Lessons for future reviews
+- Check edge cases carefully.
+- Use assertions to verify expected results.
+- Write clear method documentation.
+- Review code for correctness, readability, design, and risk.
