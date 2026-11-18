@@ -30,10 +30,22 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Compile Java source files
+      - name: Download JUnit 5
+        run: |
+          mkdir -p lib
+          curl -fL -o lib/junit-platform-console-standalone.jar \
+            https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar
+
+      - name: Compile application and tests
         run: |
           mkdir -p out
-          javac -d out src/main.java src/books_management/*.java
+          javac -cp "lib/junit-platform-console-standalone.jar" \
+            -d out src/main.java src/books_management/*.java tests/*.java
+
+      - name: Run JUnit tests
+        run: |
+          java -jar lib/junit-platform-console-standalone.jar execute \
+            --class-path out --scan-class-path --details=summary
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v8.3.0
