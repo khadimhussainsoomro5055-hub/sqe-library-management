@@ -1,69 +1,79 @@
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MemberTest {
+import org.junit.jupiter.api.Test;
 
-    public static void main(String[] args) {
+class MemberTest {
 
-        Member member1 = new Member(1, "Ali", 5);
-        Member member2 = new Member(2, "Ahmed", 10);
-        Member member3 = new Member(3, "Sara", 15);
+    private Member createMember(int id, String name, int borrowedBooks) {
+        return new Member(id, name, borrowedBooks);
+    }
 
-        List<Member> library = new ArrayList<>();
-        library.add(member1);
-        library.add(member2);
-        library.add(member3);
+    @Test
+    void shouldCalculateMiddleBorrowPercentile() {
+        Member ali = createMember(1, "Ali", 5);
+        Member ahmed = createMember(2, "Ahmed", 10);
+        Member sara = createMember(3, "Sara", 15);
 
-        // Test 1: Normal calculation
-        double result = Member.borrow_percentile(member2, library);
+        List<Member> library = List.of(ali, ahmed, sara);
 
-        if (Math.abs(result - 50.0) > 0.0001) {
-            throw new AssertionError("Normal calculation test failed!");
-        }
+        assertEquals(50.0, Member.borrow_percentile(ahmed, library), 0.0001);
+    }
 
-        System.out.println("Normal calculation test passed!");
+    @Test
+    void shouldReturnOneHundredForSingleMemberLibrary() {
+        Member ali = createMember(1, "Ali", 5);
 
-        // Test 2: Single-member library
-        List<Member> singleMemberLibrary = new ArrayList<>();
-        singleMemberLibrary.add(member1);
+        assertEquals(
+            100.0,
+            Member.borrow_percentile(ali, List.of(ali)),
+            0.0001
+        );
+    }
 
-        double singleResult =
-            Member.borrow_percentile(member1, singleMemberLibrary);
+    @Test
+    void shouldReturnZeroForLowestBorrowPercentile() {
+        Member ali = createMember(1, "Ali", 5);
+        Member ahmed = createMember(2, "Ahmed", 10);
+        Member sara = createMember(3, "Sara", 15);
 
-        if (singleResult != 100.0) {
-            throw new AssertionError("Single-member test failed!");
-        }
+        List<Member> library = List.of(ali, ahmed, sara);
 
-        System.out.println("Single-member test passed!");
+        assertEquals(0.0, Member.borrow_percentile(ali, library), 0.0001);
+    }
 
-        // Test 3: Lowest percentile
-        double lowestResult =
-            Member.borrow_percentile(member1, library);
+    @Test
+    void shouldReturnOneHundredForHighestBorrowPercentile() {
+        Member ali = createMember(1, "Ali", 5);
+        Member ahmed = createMember(2, "Ahmed", 10);
+        Member sara = createMember(3, "Sara", 15);
 
-        if (lowestResult != 0.0) {
-            throw new AssertionError("Lowest percentile test failed!");
-        }
+        List<Member> library = List.of(ali, ahmed, sara);
 
-        System.out.println("Lowest percentile test passed!");
+        assertEquals(100.0, Member.borrow_percentile(sara, library), 0.0001);
+    }
 
-        // Test 4: Highest percentile
-        double highestResult =
-            Member.borrow_percentile(member3, library);
+    @Test
+    void shouldRejectAnEmptyLibrary() {
+        Member ali = createMember(1, "Ali", 5);
 
-        if (highestResult != 100.0) {
-            throw new AssertionError("Highest percentile test failed!");
-        }
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> Member.borrow_percentile(ali, new ArrayList<>())
+        );
+    }
 
-        System.out.println("Highest percentile test passed!");
+    @Test
+    void shouldRejectANullLibrary() {
+        Member ali = createMember(1, "Ali", 5);
 
-        // Test 5: Empty library
-        try {
-            Member.borrow_percentile(member1, new ArrayList<>());
-            throw new AssertionError("Empty library test failed!");
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("Empty library test passed!");
-        }
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> Member.borrow_percentile(ali, null)
+        );
     }
 }
