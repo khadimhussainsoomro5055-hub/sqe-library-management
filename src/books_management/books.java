@@ -30,6 +30,19 @@ public class books {
     private static final int FINE_RATE_SECOND_TIER = 50;
     private static final int FINE_RATE_THIRD_TIER = 100;
 
+    // Fine calculation boundaries
+    private static final int FIRST_FINE_TIER_MAX_DAYS = 3;
+    private static final int SECOND_FINE_TIER_MAX_DAYS = 7;
+
+    // Fine category boundaries
+    private static final int LOW_FINE_MAX_DAYS = 7;
+    private static final int MEDIUM_FINE_MAX_DAYS = 14;
+    private static final int HIGH_FINE_MAX_DAYS = 30;
+
+    // Validation and record formatting
+    private static final String ISBN_PATTERN = "\\d{13}";
+    private static final String BORROW_RECORD_SEPARATOR = ":";
+
     public books(int book_Id, String book_Name,
                  String book_Author, int book_Quantity) {
 
@@ -128,7 +141,7 @@ public class books {
 
                 // Store current borrowing record
                 issuedBooks.add(
-                        bookId + ":" + memberName
+                        bookId + BORROW_RECORD_SEPARATOR + memberName
                 );
 
                 // Increase total borrowing count
@@ -148,7 +161,7 @@ public class books {
     // Return a book
     public static boolean returnBook(int bookId, String memberName) {
 
-        String record = bookId + ":" + memberName;
+        String record = bookId + BORROW_RECORD_SEPARATOR + memberName;
 
         if (issuedBooks.contains(record)) {
 
@@ -202,7 +215,9 @@ public class books {
 
         for (String record : issuedBooks) {
 
-            String[] parts = record.split(":", 2);
+            String[] parts = record.split(
+                    BORROW_RECORD_SEPARATOR, 2
+            );
 
             if (parts.length == 2 &&
                     parts[1].equals(memberName)) {
@@ -233,11 +248,11 @@ public class books {
             return 0;
         }
 
-        if (overdueDays <= 3) {
+        if (overdueDays <= FIRST_FINE_TIER_MAX_DAYS) {
             return overdueDays * FINE_RATE_FIRST_TIER;
         }
 
-        if (overdueDays <= 7) {
+        if (overdueDays <= SECOND_FINE_TIER_MAX_DAYS) {
             return overdueDays * FINE_RATE_SECOND_TIER;
         }
 
@@ -257,15 +272,15 @@ public class books {
             return "None";
         }
 
-        if (overdueDays <= 7) {
+        if (overdueDays <= LOW_FINE_MAX_DAYS) {
             return "Low";
         }
 
-        if (overdueDays <= 14) {
+        if (overdueDays <= MEDIUM_FINE_MAX_DAYS) {
             return "Medium";
         }
 
-        if (overdueDays <= 30) {
+        if (overdueDays <= HIGH_FINE_MAX_DAYS) {
             return "High";
         }
 
@@ -279,20 +294,23 @@ public class books {
             return false;
         }
 
-        return isbn.matches("\\d{13}");
+        return isbn.matches(ISBN_PATTERN);
+    }
+
+    // Shared helper for formatting book information
+    private static String formatBookDetails(books book) {
+
+        return "ID: " + book.getBook_Id()
+                + ", Name: " + book.getBook_Name()
+                + ", Author: " + book.getBook_Author()
+                + ", Quantity: " + book.getBook_Quantity();
     }
 
     // Display all books
     public static void displayBooks() {
 
         for (books book : libraryBooks) {
-
-            System.out.println(
-                    "ID: " + book.getBook_Id()
-                    + ", Name: " + book.getBook_Name()
-                    + ", Author: " + book.getBook_Author()
-                    + ", Quantity: " + book.getBook_Quantity()
-            );
+            System.out.println(formatBookDetails(book));
         }
     }
 
@@ -321,8 +339,10 @@ public class books {
                                 )
                         )
                         .reversed()
-                        .thenComparing(books::getBook_Name,
-                                String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(
+                                books::getBook_Name,
+                                String.CASE_INSENSITIVE_ORDER
+                        )
         );
 
         return rankedBooks;
@@ -334,15 +354,7 @@ public class books {
         StringBuilder content = new StringBuilder();
 
         for (books book : libraryBooks) {
-
-            content.append("ID: ")
-                    .append(book.getBook_Id())
-                    .append(", Name: ")
-                    .append(book.getBook_Name())
-                    .append(", Author: ")
-                    .append(book.getBook_Author())
-                    .append(", Quantity: ")
-                    .append(book.getBook_Quantity())
+            content.append(formatBookDetails(book))
                     .append(System.lineSeparator());
         }
 
