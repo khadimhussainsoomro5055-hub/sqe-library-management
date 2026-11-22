@@ -1,61 +1,29 @@
-# SonarCloud Findings – SQE Library Management
+# SonarCloud Findings — SQE Library Management
 
-## 1. Analysis Information
+## Analysis Information
+- Project: SQE Library Management
+- Repository: khadimhussainsoomro5055-hub/sqe-library-management
+- Language: Java 21
+- Tool: SonarCloud
 
-- **Project:** SQE Library Management
-- **Repository:** khadimhussainsoomro5055-hub/sqe-library-management
-- **Branch:** main
-- **Analysis Tool:** SonarCloud
-- **Language:** Java 21
+## Confirmed Finding in the Available Scan Notes
 
-## 2. Findings
-
-### Finding 1: TestCases should contain tests
+### java:S2187 — Test class should contain tests
 
 | Field | Details |
 |---|---|
-| Rule ID | java:S2187 |
 | File | `tests/MemberTest.java` |
-| Original Line | 5 |
-| Severity | Blocker |
-| Software Quality | Maintainability |
-| Status | Fixed |
+| Reported severity | Blocker |
+| Status | Fixed in source |
+| Resolution | Added JUnit tests for middle, lowest, highest and single-member percentile results, plus empty and null library validation. |
 
-**Description:**
+The test class now contains executable JUnit tests. The current regression suite also checks tied percentile values and invalid member input.
 
-SonarCloud reported that the `MemberTest` class did not contain any test methods. An empty test class does not provide meaningful test coverage.
+## Analyzer Configuration
+The workflow downloads the JUnit Platform Console Standalone JAR and compiles the application and test sources. The SonarCloud scan job runs only when the repository variable `SONAR_ENABLED` is set to `true` and uses the `SONAR_TOKEN` secret. The scanner configuration points to Java source and test directories and supplies the JUnit library path.
 
-**Resolution:**
+## Findings Register
+The available repository notes establish one specific Sonar rule finding. They do not provide evidence for eight distinct findings, so additional findings are not invented here. Any new issues must be copied from the actual SonarCloud Issues tab with rule, file, line, severity and explanation.
 
-Added JUnit 5 test methods to `MemberTest.java` to test the member borrowing percentile functionality.
-
-The tests cover:
-- Middle borrowing percentile
-- Single-member library
-- Lowest borrowing percentile
-- Highest borrowing percentile
-- Empty library validation
-- Null library validation
-
-**Verification:**
-
-The updated project test suite passed all 58 tests.
-
-## 3. Analysis Warnings
-
-The initial analysis reported missing Java library configuration:
-
-- `sonar.java.libraries`
-- `sonar.java.test.libraries`
-
-These were addressed by configuring the JUnit library paths and updating the GitHub Actions workflow to download the JUnit standalone JAR.
-
-The subsequent analysis no longer reported these warnings.
-
-## 4. Summary
-
-The initial analysis identified one confirmed SonarCloud issue, which was fixed by adding JUnit tests to `MemberTest.java`.
-
-No additional open issues were displayed in the latest analysis. Therefore, eight distinct findings were not available to document from the observed scan results.
-
-Further code-quality improvements will be evaluated separately.
+## Quality Gate Evidence
+A passing test workflow is not the same as a passing SonarCloud Quality Gate. The Quality Gate status and before/after dashboard screenshots must be captured from the actual SonarCloud analysis once the token and project analysis are available.
