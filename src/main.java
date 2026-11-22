@@ -10,6 +10,7 @@ public class main {
         // 1. Add books
         books book1 = new books(
             101,
+            "9780134685991",
             "Java Programming",
             "James Gosling",
             5
@@ -17,6 +18,7 @@ public class main {
 
         books book2 = new books(
             102,
+            "9780133943030",
             "Software Engineering",
             "Ian Sommerville",
             2
@@ -35,6 +37,7 @@ public class main {
         // 2. Try duplicate ID
         books duplicateBook = new books(
             101,
+            "9780132350884",
             "Clean Code",
             "Robert Martin",
             3
