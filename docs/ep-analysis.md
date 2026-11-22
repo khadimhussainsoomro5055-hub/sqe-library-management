@@ -57,4 +57,4 @@ EP does not focus on exact class edges and can miss off-by-one defects. Boundary
 - ISBN EP: ISBNValidationTest and ISBNEnforcementTest
 - Fine amount EP: CalculateFineBVATest
 
-The current CI workflow compiles and executes the JUnit suite. Test totals should be taken from a completed workflow run rather than copied from an earlier run.
+GitHub Actions run [#44997662882](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/44997662882) completed 84 tests successfully with zero failures.

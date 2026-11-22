@@ -39,4 +39,16 @@ java -jar lib\junit-platform-console-standalone.jar execute --class-path out --s
 
 Use `--details=tree` to inspect individual test names. Use `--details=summary` for a compact suite result.
 
-The current branch has not been executed in a local Java environment in this session. The actual test count and pass/fail result must be taken from the GitHub Actions run after the pull request is opened; no result is pre-filled here.
+## Latest CI Result
+
+GitHub Actions run [#44997662882](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/44997662882) compiled the application and all test sources successfully and completed the JUnit suite:
+
+| Result | Count |
+|---|---:|
+| Containers successful | 23 |
+| Tests found | 84 |
+| Tests started | 84 |
+| Tests successful | 84 |
+| Tests failed | 0 |
+
+The SonarCloud job was skipped because the repository's `SONAR_ENABLED` variable is not enabled. This JUnit result does not imply a SonarCloud Quality Gate pass.

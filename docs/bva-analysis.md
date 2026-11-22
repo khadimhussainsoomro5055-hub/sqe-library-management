@@ -61,4 +61,4 @@ JUnit coverage: CalculateFineBVATest.
 
 ## 5. Test Execution
 
-The repository's GitHub Actions workflow compiles the application and all JUnit test sources, then runs the test suite. The actual pass/fail count is recorded by the workflow run. No test count is stated here until that run has completed.
+GitHub Actions run [#44997662882](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/44997662882) compiled the application and test sources and completed 84 tests successfully with zero failures. This run validates the current PR branch.
