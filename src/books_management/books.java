@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,377 +9,288 @@ import java.util.Map;
 
 public class books {
 
-    private int book_Id;
-    private String book_Name;
-    private String book_Author;
+    private final int bookId;
+    private final String isbn;
+    private final String book_Name;
+    private final String book_Author;
     private int book_Quantity;
 
-    private static List<books> libraryBooks = new ArrayList<>();
-    private static List<String> issuedBooks = new ArrayList<>();
+    private static final List<books> libraryBooks = new ArrayList<>();
+    private static final List<String> issuedBooks = new ArrayList<>();
+    private static final Map<Integer, Integer> borrowingCounts = new HashMap<>();
 
-    // Track total times each book has been borrowed
-    private static Map<Integer, Integer> borrowingCounts =
-            new HashMap<>();
-
-    // Maximum number of books one member can borrow
     private static final int MAX_BORROW_LIMIT = 5;
-
-    // Fine rates
     private static final int FINE_RATE_FIRST_TIER = 20;
     private static final int FINE_RATE_SECOND_TIER = 50;
     private static final int FINE_RATE_THIRD_TIER = 100;
-
-    // Fine calculation boundaries
     private static final int FIRST_FINE_TIER_MAX_DAYS = 3;
     private static final int SECOND_FINE_TIER_MAX_DAYS = 7;
-
-    // Fine category boundaries
     private static final int LOW_FINE_MAX_DAYS = 7;
     private static final int MEDIUM_FINE_MAX_DAYS = 14;
     private static final int HIGH_FINE_MAX_DAYS = 30;
-
-    // Validation and record formatting
     private static final String ISBN_PATTERN = "\\d{13}";
     private static final String BORROW_RECORD_SEPARATOR = ":";
 
-    public books(int book_Id, String book_Name,
-                 String book_Author, int book_Quantity) {
-
-        if (book_Quantity < 0) {
+    /**
+     * Creates a book with an explicit ISBN. The internal book ID remains a
+     * separate identifier so ISBN formatting is never confused with catalog IDs.
+     */
+    public books(int bookId, String isbn, String bookName,
+                 String bookAuthor, int bookQuantity) {
+        if (bookId < 0) {
+            throw new IllegalArgumentException("Book ID cannot be negative.");
+        }
+        if (!validateISBN(isbn)) {
             throw new IllegalArgumentException(
-                    "Book quantity cannot be negative."
+                    "ISBN must contain exactly 13 numeric digits."
             );
         }
-
-        this.book_Id = book_Id;
-        this.book_Name = book_Name;
-        this.book_Author = book_Author;
-        this.book_Quantity = book_Quantity;
-    }
-
-    public int getBook_Id() {
-        return book_Id;
-    }
-
-    public String getBook_Name() {
-        return book_Name;
-    }
-
-    public String getBook_Author() {
-        return book_Author;
-    }
-
-    public int getBook_Quantity() {
-        return book_Quantity;
-    }
-
-    public void setBook_Quantity(int book_Quantity) {
-
-        if (book_Quantity < 0) {
-            throw new IllegalArgumentException(
-                    "Book quantity cannot be negative."
-            );
+        if (bookName == null || bookName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Book name cannot be empty.");
+        }
+        if (bookAuthor == null || bookAuthor.trim().isEmpty()) {
+            throw new IllegalArgumentException("Book author cannot be empty.");
+        }
+        if (bookQuantity < 0) {
+            throw new IllegalArgumentException("Book quantity cannot be negative.");
         }
 
-        this.book_Quantity = book_Quantity;
+        this.bookId = bookId;
+        this.isbn = isbn;
+        this.book_Name = bookName.trim();
+        this.book_Author = bookAuthor.trim();
+        this.book_Quantity = bookQuantity;
     }
 
-    // Add a new book
+    /**
+     * Backward-compatible constructor for the original lab catalog examples.
+     * It derives a unique 13-digit placeholder ISBN from the numeric catalog ID.
+     * New code should use the constructor that accepts an explicit ISBN.
+     */
+    @Deprecated
+    public books(int bookId, String bookName, String bookAuthor, int bookQuantity) {
+        this(bookId, String.format("%013d", 9780000000000L + bookId),
+                bookName, bookAuthor, bookQuantity);
+    }
+
+    public int getBookId() { return bookId; }
+
+    /** @deprecated use getBookId() */
+    @Deprecated
+    public int getBook_Id() { return getBookId(); }
+
+    public String getIsbn() { return isbn; }
+    public String getBook_Name() { return book_Name; }
+    public String getBook_Author() { return book_Author; }
+    public int getBook_Quantity() { return book_Quantity; }
+
+    public void setBook_Quantity(int bookQuantity) {
+        if (bookQuantity < 0) {
+            throw new IllegalArgumentException("Book quantity cannot be negative.");
+        }
+        this.book_Quantity = bookQuantity;
+    }
+
     public static boolean addBook(books book) {
-
-        if (book == null) {
+        if (book == null || !validateISBN(book.getIsbn())) {
             return false;
         }
-
-        if (book.getBook_Quantity() < 0) {
-            return false;
-        }
-
-        // Check for duplicate book ID
         for (books existingBook : libraryBooks) {
-
-            if (existingBook.getBook_Id() == book.getBook_Id()) {
+            if (existingBook.getBookId() == book.getBookId()
+                    || existingBook.getIsbn().equals(book.getIsbn())) {
                 return false;
             }
         }
-
         libraryBooks.add(book);
         return true;
     }
 
-    // Kept for compatibility with old Lab 3 code
+    /** Kept for compatibility with old lab examples; validation still applies. */
+    @Deprecated
     public static void addBookWithoutDuplicateCheck(books book) {
-        libraryBooks.add(book);
+        addBook(book);
     }
 
-    // Issue a book to a member
     public static boolean issueBook(int bookId, String memberName) {
-
         if (memberName == null || memberName.trim().isEmpty()) {
             return false;
         }
-
-        // Check borrowing limit
-        if (getMemberBorrowedCount(memberName) >= MAX_BORROW_LIMIT) {
+        String normalizedMember = memberName.trim();
+        if (getMemberBorrowedCount(normalizedMember) >= MAX_BORROW_LIMIT) {
+            return false;
+        }
+        String record = bookId + BORROW_RECORD_SEPARATOR + normalizedMember;
+        if (issuedBooks.contains(record)) {
             return false;
         }
 
         for (books book : libraryBooks) {
-
-            if (book.getBook_Id() == bookId) {
-
-                // No copies available
+            if (book.getBookId() == bookId) {
                 if (book.getBook_Quantity() <= 0) {
                     return false;
                 }
-
-                // Decrease available quantity
-                book.setBook_Quantity(
-                        book.getBook_Quantity() - 1
-                );
-
-                // Store current borrowing record
-                issuedBooks.add(
-                        bookId + BORROW_RECORD_SEPARATOR + memberName
-                );
-
-                // Increase total borrowing count
-                borrowingCounts.put(
-                        bookId,
-                        borrowingCounts.getOrDefault(bookId, 0) + 1
-                );
-
+                book.setBook_Quantity(book.getBook_Quantity() - 1);
+                issuedBooks.add(record);
+                borrowingCounts.put(bookId,
+                        borrowingCounts.getOrDefault(bookId, 0) + 1);
                 return true;
             }
         }
-
-        // Book does not exist
         return false;
     }
 
-    // Return a book
     public static boolean returnBook(int bookId, String memberName) {
-
-        String record = bookId + BORROW_RECORD_SEPARATOR + memberName;
-
-        if (issuedBooks.contains(record)) {
-
-            issuedBooks.remove(record);
-
-            // Increase available quantity
-            for (books book : libraryBooks) {
-
-                if (book.getBook_Id() == bookId) {
-
-                    book.setBook_Quantity(
-                            book.getBook_Quantity() + 1
-                    );
-
-                    break;
-                }
-            }
-
-            // Do not decrease borrowingCounts.
-            // It stores lifetime borrowing totals.
-
-            return true;
+        if (memberName == null || memberName.trim().isEmpty()) {
+            return false;
         }
-
-        return false;
-    }
-
-    // Search book by name - case insensitive
-    public static books searchBook(String searchName) {
-
-        if (searchName == null) {
-            return null;
-        }
-
-        for (books book : libraryBooks) {
-
-            if (book.getBook_Name()
-                    .equalsIgnoreCase(searchName.trim())) {
-
-                return book;
-            }
-        }
-
-        return null;
-    }
-
-    // Count books currently borrowed by a member
-    public static int getMemberBorrowedCount(String memberName) {
-
-        int count = 0;
-
-        for (String record : issuedBooks) {
-
-            String[] parts = record.split(
-                    BORROW_RECORD_SEPARATOR, 2
-            );
-
-            if (parts.length == 2 &&
-                    parts[1].equals(memberName)) {
-
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    // Check whether member can borrow another book
-    public static boolean canBorrow(String memberName) {
-
-        return getMemberBorrowedCount(memberName)
-                < MAX_BORROW_LIMIT;
-    }
-
-    // Get maximum borrowing limit
-    public static int getBorrowLimit() {
-        return MAX_BORROW_LIMIT;
-    }
-
-    // Calculate fine based on overdue days
-    public static int calculateFine(int overdueDays) {
-
-        if (overdueDays <= 0) {
-            return 0;
-        }
-
-        if (overdueDays <= FIRST_FINE_TIER_MAX_DAYS) {
-            return overdueDays * FINE_RATE_FIRST_TIER;
-        }
-
-        if (overdueDays <= SECOND_FINE_TIER_MAX_DAYS) {
-            return overdueDays * FINE_RATE_SECOND_TIER;
-        }
-
-        return overdueDays * FINE_RATE_THIRD_TIER;
-    }
-
-    // Return fine tier based on overdue days
-    public static String fineTier(int overdueDays) {
-
-        if (overdueDays < 0) {
-            throw new IllegalArgumentException(
-                    "Overdue days cannot be negative."
-            );
-        }
-
-        if (overdueDays == 0) {
-            return "None";
-        }
-
-        if (overdueDays <= LOW_FINE_MAX_DAYS) {
-            return "Low";
-        }
-
-        if (overdueDays <= MEDIUM_FINE_MAX_DAYS) {
-            return "Medium";
-        }
-
-        if (overdueDays <= HIGH_FINE_MAX_DAYS) {
-            return "High";
-        }
-
-        return "Severe";
-    }
-
-    // Validate ISBN - exactly 13 numeric digits
-    public static boolean validateISBN(String isbn) {
-
-        if (isbn == null) {
+        String record = bookId + BORROW_RECORD_SEPARATOR + memberName.trim();
+        int recordIndex = issuedBooks.indexOf(record);
+        if (recordIndex < 0) {
             return false;
         }
 
-        return isbn.matches(ISBN_PATTERN);
+        books matchingBook = null;
+        for (books book : libraryBooks) {
+            if (book.getBookId() == bookId) {
+                matchingBook = book;
+                break;
+            }
+        }
+        if (matchingBook == null) {
+            return false;
+        }
+
+        issuedBooks.remove(recordIndex);
+        matchingBook.setBook_Quantity(matchingBook.getBook_Quantity() + 1);
+        return true;
     }
 
-    // Shared helper for formatting book information
-    private static String formatBookDetails(books book) {
+    public static books searchBook(String searchName) {
+        if (searchName == null) {
+            return null;
+        }
+        String normalizedSearch = searchName.trim();
+        if (normalizedSearch.isEmpty()) {
+            return null;
+        }
+        for (books book : libraryBooks) {
+            if (book.getBook_Name().equalsIgnoreCase(normalizedSearch)) {
+                return book;
+            }
+        }
+        return null;
+    }
 
-        return "ID: " + book.getBook_Id()
+    public static int getMemberBorrowedCount(String memberName) {
+        if (memberName == null) {
+            return 0;
+        }
+        int count = 0;
+        for (String record : issuedBooks) {
+            String[] parts = record.split(BORROW_RECORD_SEPARATOR, 2);
+            if (parts.length == 2 && parts[1].equals(memberName.trim())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static boolean canBorrow(String memberName) {
+        return memberName != null
+                && !memberName.trim().isEmpty()
+                && getMemberBorrowedCount(memberName) < MAX_BORROW_LIMIT;
+    }
+
+    public static int getBorrowLimit() { return MAX_BORROW_LIMIT; }
+
+    public static int calculateFine(int overdueDays) {
+        if (overdueDays < 0) {
+            throw new IllegalArgumentException("Overdue days cannot be negative.");
+        }
+        if (overdueDays == 0) {
+            return 0;
+        }
+        if (overdueDays <= FIRST_FINE_TIER_MAX_DAYS) {
+            return overdueDays * FINE_RATE_FIRST_TIER;
+        }
+        if (overdueDays <= SECOND_FINE_TIER_MAX_DAYS) {
+            return overdueDays * FINE_RATE_SECOND_TIER;
+        }
+        return overdueDays * FINE_RATE_THIRD_TIER;
+    }
+
+    public static String fineTier(int overdueDays) {
+        if (overdueDays < 0) {
+            throw new IllegalArgumentException("Overdue days cannot be negative.");
+        }
+        if (overdueDays == 0) return "None";
+        if (overdueDays <= LOW_FINE_MAX_DAYS) return "Low";
+        if (overdueDays <= MEDIUM_FINE_MAX_DAYS) return "Medium";
+        if (overdueDays <= HIGH_FINE_MAX_DAYS) return "High";
+        return "Severe";
+    }
+
+    public static boolean validateISBN(String isbn) {
+        return isbn != null && isbn.matches(ISBN_PATTERN);
+    }
+
+    private static String formatBookDetails(books book) {
+        return "ID: " + book.getBookId()
+                + ", ISBN: " + book.getIsbn()
                 + ", Name: " + book.getBook_Name()
                 + ", Author: " + book.getBook_Author()
                 + ", Quantity: " + book.getBook_Quantity();
     }
 
-    // Display all books
     public static void displayBooks() {
-
         for (books book : libraryBooks) {
             System.out.println(formatBookDetails(book));
         }
     }
 
-    // Calculate total available copies
     public static int totalAvailableCopies() {
-
         int total = 0;
-
         for (books book : libraryBooks) {
             total += book.getBook_Quantity();
         }
-
         return total;
     }
 
-    // Rank books by popularity
     public static List<books> rankBooksByPopularity() {
-
         List<books> rankedBooks = new ArrayList<>(libraryBooks);
-
         rankedBooks.sort(
-                Comparator
-                        .comparingInt(
-                                (books book) -> borrowingCounts.getOrDefault(
-                                        book.getBook_Id(), 0
-                                )
-                        )
-                        .reversed()
-                        .thenComparing(
-                                books::getBook_Name,
-                                String.CASE_INSENSITIVE_ORDER
-                        )
+                Comparator.comparingInt(
+                        (books book) -> borrowingCounts.getOrDefault(book.getBookId(), 0)
+                ).reversed().thenComparing(
+                        books::getBook_Name, String.CASE_INSENSITIVE_ORDER
+                )
         );
-
         return rankedBooks;
     }
 
-    // Export the catalog using an injectable writer
     public static void exportCatalog(String path, CatalogWriter writer) {
-
-        StringBuilder content = new StringBuilder();
-
-        for (books book : libraryBooks) {
-            content.append(formatBookDetails(book))
-                    .append(System.lineSeparator());
+        if (path == null || path.trim().isEmpty() || writer == null) {
+            throw new IllegalArgumentException("Path and writer are required.");
         }
-
+        StringBuilder content = new StringBuilder();
+        for (books book : libraryBooks) {
+            content.append(formatBookDetails(book)).append(System.lineSeparator());
+        }
         try {
             writer.write(path, content.toString());
-
         } catch (IOException e) {
-
-            throw new LibraryIOError(
-                    "Failed to export library catalog.", e
-            );
+            throw new LibraryIOError("Failed to export library catalog.", e);
         }
     }
 
-    // Clear data - useful for testing
     public static void clearLibrary() {
-
         libraryBooks.clear();
         issuedBooks.clear();
         borrowingCounts.clear();
     }
 
     public static void exportCatalog(String path) {
-
         exportCatalog(path, (filePath, content) ->
-                Files.writeString(Path.of(filePath), content)
-        );
+                Files.writeString(Path.of(filePath), content));
     }
 }

@@ -1,48 +1,44 @@
-# SQE-Library_Management-System
+# SQE Library Management System
 
 ## Badges
 
-<!-- CI badge will be added in Lab 14 -->
+[![Java Tests](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/workflows/build.yml/badge.svg)](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/workflows/build.yml)
 
 ## Project Overview
 
-LibraryHub is a Java-based Library Management System developed as part of the Software Quality Engineering (SQE) laboratory work.
-
-The project provides basic library operations, including adding books, searching books, issuing books, returning books, and managing book availability. It also demonstrates software testing techniques such as unit testing, equivalence partitioning, boundary value analysis, and test-driven development.
+LibraryHub is a Java 21 Library Management System developed for Software Quality Engineering laboratory work. It supports catalog management, ISBN validation, searching, issuing and returning books, borrowing limits, overdue fine calculations, popularity ranking and catalog export. The project applies black-box testing, boundary-value analysis, JUnit unit testing, test doubles, test-driven development and static-analysis workflow practices.
 
 ## Features
 
-- Add new books to the library.
-- Display all available books.
-- Search books by title.
-- Issue books to library members.
-- Return issued books.
-- Prevent duplicate book IDs.
-- Validate book quantities.
-- Enforce a borrowing limit of five books per member.
-- Calculate overdue fines.
-- Validate ISBN numbers.
-- Rank books according to borrowing popularity.
-- Export library catalog information.
+- Add books with a unique catalog ID and a valid 13-digit ISBN.
+- Reject duplicate catalog IDs and ISBNs.
+- Validate book names, authors and non-negative quantities.
+- Search titles without case sensitivity.
+- Issue available books to members.
+- Prevent duplicate concurrent loans of the same book by one member.
+- Enforce a maximum of five active loans per member.
+- Return only an active loan held by the specified member.
+- Calculate overdue fines using the configured rate tiers.
+- Rank books by borrowing popularity.
+- Calculate member borrowing percentiles.
+- Export catalog details through an injectable writer.
 
-## Technologies Used
+## Technologies
 
 - Java 21
 - JUnit 5
-- Git
-- GitHub
+- Git and GitHub
+- GitHub Actions
+- SonarCloud (optional repository configuration)
 
 ## Project Structure
 
 ```text
 sqe-library-management/
-│
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.md
-│   │   └── feature_request.md
+│   ├── workflows/build.yml
 │   └── pull_request_template.md
-│
 ├── docs/
 │   ├── requirements.md
 │   ├── test-plan.md
@@ -50,108 +46,66 @@ sqe-library-management/
 │   ├── rtm.md
 │   ├── ep-analysis.md
 │   ├── bva-analysis.md
-│   ├── triage-log.md
+│   ├── unit-testing-notes.md
 │   ├── tdd-log.md
-│   └── code-review-checklist.md
-│
+│   ├── code-review-checklist.md
+│   ├── sonar-findings.md
+│   └── triage-log.md
 ├── src/
 │   ├── main.java
 │   └── books_management/
-│
 ├── tests/
-│   └── JUnit test files
-│
 ├── screenshots/
+├── CONTRIBUTING.md
 ├── LICENSE
 └── README.md
 ```
 
 ## Requirements
 
-Before running this project, make sure you have installed:
-
-1. Java Development Kit (JDK) 21.
-2. Git.
-3. JUnit 5 for running automated tests.
+Install JDK 21 and Git.
 
 ## Installation
 
-Clone the repository:
-
 ```bash
 git clone https://github.com/khadimhussainsoomro5055-hub/sqe-library-management.git
-```
-
-Move into the project directory:
-
-```bash
 cd sqe-library-management
 ```
 
-## Running the Application
-
-Compile the Java source files:
+## Run the Application
 
 ```bash
+mkdir out
 javac -d out src/main.java src/books_management/*.java
-```
-
-Run the application:
-
-```bash
 java -cp out main
 ```
 
-## Running Tests
+## Run the Tests
 
-This project uses JUnit 5 for automated testing.
+Download the JUnit Platform Console Standalone JAR from Maven Central and save it as `lib/junit-platform-console-standalone.jar`.
 
-Download the JUnit Platform Console Standalone JAR and place it inside a `lib` directory in the project root.
-
-Compile the application and test files:
+Linux/macOS:
 
 ```bash
+mkdir -p lib out
+curl -fL -o lib/junit-platform-console-standalone.jar https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar
 javac -cp "lib/junit-platform-console-standalone.jar" -d out src/main.java src/books_management/*.java tests/*.java
-```
-
-Run all tests:
-
-```bash
-java -jar lib/junit-platform-console-standalone.jar execute --class-path out --scan-class-path
-```
-
-Run tests with detailed output:
-
-```bash
-java -jar lib/junit-platform-console-standalone.jar execute --class-path out --scan-class-path --details=tree
-```
-
-Run tests with summary output:
-
-```bash
 java -jar lib/junit-platform-console-standalone.jar execute --class-path out --scan-class-path --details=summary
 ```
 
-## Documentation
+Windows PowerShell:
 
-Additional project documentation is available in the `docs/` directory.
-
-It includes:
-
-- Project requirements
-- Test plan
-- Test cases
-- Requirements Traceability Matrix (RTM)
-- Equivalence Partitioning analysis
-- Boundary Value Analysis
-- Defect triage log
-- TDD development log
-- Code review checklist
+```powershell
+New-Item -ItemType Directory -Force lib,out
+Invoke-WebRequest -Uri https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar -OutFile lib/junit-platform-console-standalone.jar
+javac -cp "lib\junit-platform-console-standalone.jar" -d out src\main.java src\books_management\*.java tests\*.java
+java -jar lib\junit-platform-console-standalone.jar execute --class-path out --scan-class-path --details=summary
+```
 
 ## Contribution
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before making changes or submitting a pull request.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the branch, commit, testing and pull-request conventions.
 
 ## License
 
-This project is licensed under the terms provided in the LICENSE file.
+See [LICENSE](LICENSE).
