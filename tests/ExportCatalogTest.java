@@ -35,7 +35,7 @@ public class ExportCatalogTest {
 
         // Assert
         String expected =
-            "ID: 301, Name: Clean Code, Author: Robert Martin, Quantity: 4"
+            "ID: 301, ISBN: 9780000000301, Name: Clean Code, Author: Robert Martin, Quantity: 4"
             + System.lineSeparator();
 
         assertEquals(expected, writtenContent.toString());
