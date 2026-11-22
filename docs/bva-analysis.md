@@ -1,25 +1,12 @@
 # Boundary Value Analysis
 
-## 1. Introduction
+Boundary Value Analysis (BVA) checks values immediately below, at, and immediately above the boundaries in an input domain. This analysis complements the Equivalence Partitioning work.
 
-Boundary Value Analysis (BVA) is a black-box testing technique that focuses on values at the boundaries of input ranges. It tests the boundary value itself and the values immediately below and above it.
+## 1. Fine Tier — Days Overdue
 
-This analysis is for the Java Library Management System and complements the Equivalence Partitioning performed in Lab 5.
+Fine-tier categories are: 0 = None, 1–7 = Low, 8–14 = Medium, 15–30 = High, and 31+ = Severe. Negative values are invalid.
 
-## 2. Input 1 — Fine Tier / Days Overdue
-
-The fine-tier rules are:
-
-- 0 days → None
-- 1–7 days → Low
-- 8–14 days → Medium
-- 15–30 days → High
-- 31 or more days → Severe
-- Negative days → Invalid
-
-The important boundaries are 0, 1, 7, 8, 14, 15, 30, and 31.
-
-| Boundary | Value - 1 | Expected | Boundary Value | Expected | Value + 1 | Expected |
+| Boundary | Value - 1 | Expected | Boundary | Expected | Value + 1 | Expected |
 |---|---:|---|---:|---|---:|---|
 | 0 | -1 | Invalid | 0 | None | 1 | Low |
 | 1 | 0 | None | 1 | Low | 2 | Low |
@@ -30,93 +17,48 @@ The important boundaries are 0, 1, 7, 8, 14, 15, 30, and 31.
 | 30 | 29 | High | 30 | High | 31 | Severe |
 | 31 | 30 | High | 31 | Severe | 32 | Severe |
 
-## 3. Input 2 — Number of Books on Loan
+JUnit coverage: FineTierBVATest.
 
-The Lab 5 borrowing rule allows a member to have between 0 and 5 books on loan at the same time.
+## 2. Borrowing Limit
 
-For BVA, we focus on the maximum boundary of 5 books. The member attempts to borrow one additional book.
+A member may have up to five concurrent loans. The relevant values are four, five and six existing loans before attempting another issue.
 
-| Current Books | Action | Expected Result |
+| Existing Loans | Attempt | Expected |
 |---:|---|---|
-| 4 | Attempt to borrow one more | Allowed |
-| 5 | Attempt to borrow one more | Rejected |
-| 6 | Attempt to borrow one more | Rejected |
+| 4 | Borrow one more | Allowed; total becomes 5 |
+| 5 | Borrow one more | Rejected; total remains 5 |
+| 6 | Borrow one more | Rejected; this state cannot be reached through the public issue operation |
 
-### Borrowing-Limit Boundary Values
+JUnit coverage: BorrowLimitTest exercises the reachable transitions and confirms the sixth issue is rejected.
 
-The selected boundary values are:
+## 3. ISBN Length
 
-```text
-4, 5, 6
-```
+Only 13 numeric digits are accepted.
 
-## 4. Input 3 — ISBN Length
-
-The ISBN rule requires exactly 13 numeric digits.
-
-For BVA, we focus on the boundary of 13 digits.
-
-| ISBN Length | Description | Expected Result |
+| Length | Description | Expected |
 |---:|---|---|
-| 11 | Below the valid length | Invalid |
-| 12 | Immediately below the valid length | Invalid |
-| 13 | Required valid length | Valid |
-| 14 | Immediately above the valid length | Invalid |
-| 15 | Above the valid length | Invalid |
+| 11 | Below boundary | Invalid |
+| 12 | Immediately below | Invalid |
+| 13 | Exact required length | Valid |
+| 14 | Immediately above | Invalid |
+| 15 | Above boundary | Invalid |
 
-### ISBN Boundary Values
+JUnit coverage: ISBNValidationTest and ISBNEnforcementTest.
 
-The selected boundary values are:
+## 4. Monetary Fine Calculation Boundaries
 
-```text
-11, 12, 13, 14, 15
-```
-## 5. BVA Test Execution Results
+The monetary fine rates are independent from the fine-tier labels: 1–3 days at Rs. 20/day, 4–7 days at Rs. 50/day, and 8+ days at Rs. 100/day. Negative days are rejected.
 
-Boundary Value Analysis tests were implemented using JUnit for the Java Library Management System.
+| Boundary | Value - 1 | Expected | Boundary | Expected | Value + 1 | Expected |
+|---|---:|---:|---:|---:|---:|---:|
+| 0 | -1 | Invalid | 0 | Rs. 0 | 1 | Rs. 20 |
+| 3 | 2 | Rs. 40 | 3 | Rs. 60 | 4 | Rs. 200 |
+| 4 | 3 | Rs. 60 | 4 | Rs. 200 | 5 | Rs. 250 |
+| 7 | 6 | Rs. 300 | 7 | Rs. 350 | 8 | Rs. 800 |
+| 8 | 7 | Rs. 350 | 8 | Rs. 800 | 9 | Rs. 900 |
 
-### Fine-Tier BVA
+JUnit coverage: CalculateFineBVATest.
 
-- Test class: `FineTierBVATest`
-- Tests found: 15
-- Tests successful: 15
-- Tests failed: 0
+## 5. Test Execution
 
-Result: **PASS**
-
-The tests covered the fine-tier boundaries at 0, 1, 7, 8, 14, 15, 30, and 31, including the invalid boundary value -1.
-
-### Borrowing-Limit BVA
-
-- Test class: `BorrowLimitTest`
-- Tests found: 3
-- Tests successful: 3
-- Tests failed: 0
-
-Result: **PASS**
-
-The boundary behavior was verified by testing the transition from 4 to 5 books and attempting to exceed the maximum limit from 5 to 6 books.
-
-### ISBN-Length BVA
-
-- Test class: `ISBNValidationTest`
-- Tests found: 11
-- Tests successful: 11
-- Tests failed: 0
-
-Result: **PASS**
-
-ISBN lengths of 11, 12, 13, 14, and 15 digits were tested. Only exactly 13 numeric digits were accepted.
-
-## 6. Overall BVA Result
-
-| Test Area | Tests | Passed | Failed |
-|---|---:|---:|---:|
-| Fine-Tier BVA | 15 | 15 | 0 |
-| Borrowing-Limit BVA | 3 | 3 | 0 |
-| ISBN-Length BVA | 11 | 11 | 0 |
-| **Total** | **29** | **29** | **0** |
-
-The combined Boundary Value Analysis tests completed successfully with **29 tests passed and 0 tests failed**.
-
-No boundary defect was identified in the tested fine-tier, borrowing-limit, or ISBN-length behavior.
+The repository's GitHub Actions workflow compiles the application and all JUnit test sources, then runs the test suite. The actual pass/fail count is recorded by the workflow run. No test count is stated here until that run has completed.

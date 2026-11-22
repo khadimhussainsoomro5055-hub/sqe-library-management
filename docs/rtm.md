@@ -2,43 +2,28 @@
 
 | Requirement ID | Requirement | Test Case IDs | Coverage Status |
 |---|---|---|---|
-| REQ-1 | The system shall allow a new book to be added to the library. | TC-001 | Covered |
-| REQ-2 | The system shall reject a book with a duplicate book ID. | TC-002 | Covered |
-| REQ-3 | The system shall reject a book with a negative quantity. | TC-013 | Covered |
-| REQ-4 | The system shall allow an available book to be issued to a member. | TC-004, TC-008 | Covered |
-| REQ-5 | The system shall prevent a book from being issued when no copies are available. | TC-005, TC-009 | Covered |
-| REQ-6 | The system shall allow an issued book to be returned. | TC-006, TC-007 | Covered |
-| REQ-7 | The system shall allow users to search for a book by its name. | TC-014 | Covered |
-| REQ-8 | The system shall enforce the member borrowing limit and calculate fines for overdue books. | TC-008, TC-009, TC-010, TC-011, TC-012 | Covered |
+| REQ-1 | Add a valid new book | TC-001, TC-015 | Covered |
+| REQ-2 | Reject duplicate catalog IDs and ISBNs | TC-002, TC-016 | Covered |
+| REQ-3 | Reject negative quantities | TC-013 | Covered |
+| REQ-4 | Issue an available book | TC-004, TC-008 | Covered |
+| REQ-5 | Reject issue when no copies are available | TC-005 | Covered |
+| REQ-6 | Return only an active loan and restore inventory | TC-006, TC-007, TC-017 | Covered |
+| REQ-7 | Search by title without case sensitivity | TC-014, TC-018 | Covered |
+| REQ-8 | Enforce five-loan limit and calculate fines | TC-008, TC-009, TC-010, TC-011, TC-012, TC-019 | Covered |
+| REQ-9 | Validate ISBN format and length | TC-003, TC-015, TC-016 | Covered |
+| REQ-10 | Prevent duplicate concurrent loans | TC-020 | Covered |
 
 ## Coverage Review
 
-All eight requirements have at least one valid linked test case.
+Every functional requirement has at least one linked test case. TC-003 is now an executable ISBN-format test rather than a blocked numeric-ID input. The catalog model keeps the internal catalog ID and ISBN as separate fields: this avoids treating an ISBN string as an integer and preserves leading zeroes.
 
-TC-003 is blocked because the current system uses an integer book ID and does not support entering a malformed text value such as "ABC".
+## Traceability Notes
 
-TC-013 was added to close the coverage gap for REQ-3.
+- TC-015 verifies valid ISBN acceptance and retention.
+- TC-016 verifies duplicate ISBN rejection across different catalog IDs.
+- TC-017 verifies that only the member holding a loan can return it and that a loan cannot be returned twice.
+- TC-018 verifies case-insensitive title search and safe handling of blank searches.
+- TC-019 verifies the exact monetary fine values at the 3/4 and 7/8 day rate boundaries.
+- TC-020 verifies duplicate-loan prevention and confirms inventory is unchanged after a rejected second issue.
 
-TC-014 was added to close the coverage gap for REQ-7.
-
-After adding TC-013 and TC-014, all eight requirements have valid test-case coverage.
-
-No requirement has zero test-case coverage.
-
-## Traceability Summary
-
-REQ-1 is verified by TC-001.
-
-REQ-2 is verified by TC-002.
-
-REQ-3 is verified by TC-013.
-
-REQ-4 is verified by TC-004 and TC-008.
-
-REQ-5 is verified by TC-005 and TC-009.
-
-REQ-6 is verified by TC-006 and TC-007.
-
-REQ-7 is verified by TC-014.
-
-REQ-8 is verified by TC-008, TC-009, TC-010, TC-011, and TC-012.
+Automated execution status is reported by the repository's GitHub Actions workflow. Do not treat a test as executed until the workflow run has completed successfully.

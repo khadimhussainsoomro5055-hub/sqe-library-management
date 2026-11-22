@@ -2,136 +2,59 @@
 
 ## 1. Introduction
 
-Equivalence Partitioning (EP) is a black-box testing technique used to divide input values into groups, called equivalence classes. Values in the same class are expected to produce similar system behavior. Instead of testing every possible value, one representative value is selected from each class.
+Equivalence Partitioning (EP) divides an input domain into groups whose values are expected to produce the same behavior. One representative value is selected from each group to reduce redundant tests. This analysis applies to the Java Library Management System.
 
-This analysis is for the Java Library Management System.
+## 2. Input 1 — Days Overdue for Fine Tier
 
----
-
-## 2. Input 1 — Number of Days Overdue
-
-The overdue days are divided into equivalence classes according to the fine-tier rules.
-
-| Class | Input Range | Description | Representative Value | Valid/Invalid |
+| Class | Input Range | Description | Representative | Validity |
 |---|---|---|---:|---|
-| EC-1 | Less than 0 | Negative overdue days are invalid | -3 | Invalid |
-| EC-2 | 0 | No overdue days, so no fine | 0 | Valid |
+| EC-1 | Less than 0 | Negative overdue days | -3 | Invalid |
+| EC-2 | 0 | No overdue fine tier | 0 | Valid |
 | EC-3 | 1–7 | Low fine tier | 4 | Valid |
 | EC-4 | 8–14 | Medium fine tier | 10 | Valid |
 | EC-5 | 15–30 | High fine tier | 20 | Valid |
-| EC-6 | 31 or more | Severe tier | 45 | Valid |
-
-### Selected Representatives
-
-The representative values are:
-
-- EC-1 → -3
-- EC-2 → 0
-- EC-3 → 4
-- EC-4 → 10
-- EC-5 → 20
-- EC-6 → 45
-
----
+| EC-6 | 31 or more | Severe fine tier | 45 | Valid |
 
 ## 3. Input 2 — Number of Books on Loan
 
-The business rule states that a member may have between 0 and 5 books on loan at the same time.
-
-| Class | Input Range | Description | Representative Value | Valid/Invalid |
+| Class | Input Range | Description | Representative | Validity |
 |---|---|---|---:|---|
-| EC-7 | 0–5 books | Member is within the allowed borrowing limit | 3 | Valid |
-| EC-8 | 6 or more books | Member has exceeded the borrowing limit | 6 | Invalid |
+| EC-7 | 0–5 | Member is within borrowing limit | 3 | Valid |
+| EC-8 | 6 or more | Member exceeds borrowing limit | 6 | Invalid state |
 
-### Selected Representatives
-
-The representative values are:
-
-- EC-7 → 3 books
-- EC-8 → 6 books
-
----
+The public issue operation prevents a member from reaching six active loans. The executable negative case is therefore a member with five active loans attempting a sixth.
 
 ## 4. Input 3 — ISBN
 
-The ISBN field must contain exactly 13 numeric digits with no letters or symbols.
-
-| Class | Input | Description | Representative Value | Valid/Invalid |
+| Class | Input | Description | Representative | Validity |
 |---|---|---|---|---|
-| EC-9 | Exactly 13 numeric digits | Correct ISBN format | 9780134685991 | Valid |
-| EC-10 | Empty string | ISBN is missing | "" | Invalid |
-| EC-11 | Fewer than 13 digits | ISBN is too short | 123456789 | Invalid |
-| EC-12 | Letters or symbols | ISBN contains invalid characters | 97801346ABC91 | Invalid |
+| EC-9 | Exactly 13 numeric digits | Valid ISBN format | 9780134685991 | Valid |
+| EC-10 | Empty or null | ISBN missing | "" | Invalid |
+| EC-11 | Fewer than 13 digits | ISBN too short | 123456789 | Invalid |
+| EC-12 | More than 13 digits | ISBN too long | 12345678901234 | Invalid |
+| EC-13 | Letters or symbols | Non-numeric ISBN | 97801346ABC91 | Invalid |
 
-### Selected Representatives
+## 5. Input 4 — Fine Amount Calculation
 
-The representative values are:
+The monetary calculation uses a separate rate schedule from the fine-tier label:
 
-- EC-9 → `9780134685991`
-- EC-10 → `""`
-- EC-11 → `123456789`
-- EC-12 → `97801346ABC91`
-
----
-
-## 5. Equivalence Partitioning Summary
-
-| Input | Number of Classes | Valid Classes | Invalid Classes |
-|---|---:|---|---|
-| Days overdue | 6 | EC-2, EC-3, EC-4, EC-5, EC-6 | EC-1 |
-| Books on loan | 2 | EC-7 | EC-8 |
-| ISBN | 4 | EC-9 | EC-10, EC-11, EC-12 |
-
-A representative value from each equivalence class will be used for automated JUnit testing.
-
----
+| Class | Overdue days | Rate | Representative |
+|---|---|---|---:|
+| EC-14 | 0 | No fine | 0 |
+| EC-15 | 1–3 | Rs. 20 per day | 2 |
+| EC-16 | 4–7 | Rs. 50 per day | 5 |
+| EC-17 | 8 or more | Rs. 100 per day | 9 |
+| EC-18 | Negative | Invalid input | -1 |
 
 ## 6. Limitation of Equivalence Partitioning
 
-Equivalence Partitioning does not focus on the exact boundaries between classes. Therefore, it can miss errors that occur at boundary values, such as 7 and 8 overdue days or 30 and 31 overdue days.
+EP does not focus on exact class edges and can miss off-by-one defects. Boundary Value Analysis complements EP by checking values immediately below, at, and above each boundary.
 
-Boundary Value Analysis is needed to specifically test these edges. The next lab uses Boundary Value Analysis to address this limitation.
+## 7. Automated Test Mapping
 
-## 7. JUnit Test Execution Results
+- Fine-tier EP: FineTierTest
+- Borrowing-limit EP: BorrowLimitTest
+- ISBN EP: ISBNValidationTest and ISBNEnforcementTest
+- Fine amount EP: CalculateFineBVATest
 
-The EP test cases were implemented using JUnit because the Library Management System is a Java project.
-
-### Fine Tier Tests
-
-- Test class: `FineTierTest`
-- Tests found: 6
-- Tests successful: 6
-- Tests failed: 0
-
-Result: **PASS**
-
-### Borrowing Limit Tests
-
-- Test class: `BorrowLimitTest`
-- Tests found: 2
-- Tests successful: 2
-- Tests failed: 0
-
-Result: **PASS**
-
-### ISBN Validation Tests
-
-- Test class: `ISBNValidationTest`
-- Tests found: 6
-- Tests successful: 6
-- Tests failed: 0
-
-Result: **PASS**
-
-### Overall EP Testing Result
-
-All implemented Equivalence Partitioning tests passed successfully.
-
-| Test Class | Tests | Passed | Failed |
-|---|---:|---:|---:|
-| FineTierTest | 6 | 6 | 0 |
-| BorrowLimitTest | 2 | 2 | 0 |
-| ISBNValidationTest | 6 | 6 | 0 |
-| **Total** | **14** | **14** | **0** |
-
-The test suite demonstrates that the selected representative values from the equivalence classes produce the expected results.
+The current CI workflow compiles and executes the JUnit suite. Test totals should be taken from a completed workflow run rather than copied from an earlier run.
