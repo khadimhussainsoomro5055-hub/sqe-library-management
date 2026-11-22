@@ -1,34 +1,30 @@
+public final class LibraryTestFixture {
 
-public class LibraryTestFixture {
+    private LibraryTestFixture() {
+    }
 
-    // Shared helper: resets mutable library state before preparing a test.
     public static void resetLibrary() {
         books.clearLibrary();
     }
 
-    // Reusable helper: adds a book with the supplied details.
-    public static void addBook(
-            int id,
-            String title,
-            String author,
-            int quantity) {
-
-        books.addBook(
-            new books(id, title, author, quantity)
-        );
+    public static void addBook(int id, String title, String author, int quantity) {
+        boolean added = books.addBook(new books(id, title, author, quantity));
+        if (!added) {
+            throw new IllegalStateException("Fixture book could not be added: " + id);
+        }
     }
 
-    // Reusable helper: prepares a catalog of six books for borrowing tests.
+    public static void addBook(int id, String isbn, String title, String author, int quantity) {
+        boolean added = books.addBook(new books(id, isbn, title, author, quantity));
+        if (!added) {
+            throw new IllegalStateException("Fixture book could not be added: " + id);
+        }
+    }
+
     public static void prepareBorrowingCatalog() {
         resetLibrary();
-
         for (int i = 1; i <= 6; i++) {
-            addBook(
-                500 + i,
-                "Book " + i,
-                "Author " + i,
-                1
-            );
+            addBook(500 + i, "Book " + i, "Author " + i, 1);
         }
     }
 }
