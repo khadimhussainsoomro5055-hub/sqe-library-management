@@ -25,11 +25,11 @@
 - [ ] Are invalid inputs prevented from changing inventory?
 - [ ] Are file and runtime failures handled safely?
 
-## 6. Review Retrospective
+## 6. Lessons Learned
 
-The most valuable review check was correctness at edge cases. It exposed the percentile denominator problem and missing empty-library handling. The implementation now validates null and empty inputs, rejects members not in the supplied library, handles a one-member library, and tests tied values.
+The most valuable checklist item was checking **boundaries, invalid inputs and empty collections**. It helped identify the percentile calculation issue and the missing handling for an empty library. These checks reminded me to test edge cases, not just normal input.
 
-For future reviews, I would add this checkpoint: **Does a rejected operation leave all catalog quantities and loan records unchanged?**
+For the next review, I would add this item: **Does a rejected operation leave catalog quantities and loan records unchanged?** This will help catch unintended side effects when an operation fails.
 
 ## 7. Review Evidence
 
