@@ -61,6 +61,14 @@ class LibraryCoreEdgeCasesTest {
     }
 
     @Test
+    void deprecatedCompatibilityAddMethodDelegatesToValidatedAdd() {
+        books book = new books(16, "9780134685991", "Compatibility", "Author", 1);
+        books.addBookWithoutDuplicateCheck(book);
+        assertSame(book, books.searchBook("Compatibility"));
+        assertEquals(1, books.totalAvailableCopies());
+    }
+
+    @Test
     void quantitySetterRejectsNegativeAndAcceptsZero() {
         books book = new books(11, "9780134685991", "Title", "Author", 2);
         assertThrows(IllegalArgumentException.class, () -> book.setBook_Quantity(-1));
@@ -103,6 +111,25 @@ class LibraryCoreEdgeCasesTest {
         assertFalse(books.returnBook(13, "  "));
         assertFalse(books.returnBook(13, "Ali"));
         assertEquals(1, books.searchBook("Returnable").getBook_Quantity());
+    }
+
+    @Test
+    void returnBookHandlesCatalogEntryRemovedAfterLoan() throws Exception {
+        LibraryTestFixture.addBook(17, "9780133943030", "Removed Entry", "Author", 1);
+        assertTrue(books.issueBook(17, "Ali"));
+
+        // Exercise the defensive branch where a loan record remains but its catalog entry is gone.
+        java.lang.reflect.Field catalog = books.class.getDeclaredField("libraryBooks");
+        catalog.setAccessible(true);
+        ((java.util.List<?>) catalog.get(null)).clear();
+
+        assertFalse(books.returnBook(17, "Ali"));
+    }
+
+    @Test
+    void searchReturnsNullWhenNoTitleMatches() {
+        LibraryTestFixture.addBook(18, "9780133943030", "Known Title", "Author", 1);
+        assertNull(books.searchBook("Missing Title"));
     }
 
     @Test
