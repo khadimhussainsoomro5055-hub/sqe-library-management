@@ -119,7 +119,6 @@ public class main {
 
         System.out.println("\n=== Program Finished ===");
     }
-}
 
     static void displaySearchResult(books result) {
         if (result != null) {
@@ -128,3 +127,4 @@ public class main {
             System.out.println("Book not found.");
         }
     }
+}
