@@ -50,6 +50,7 @@ jobs:
             java -jar lib/jacococli.jar report coverage/jacoco.exec \
               --classfiles out \
               --sourcefiles src \
+              --sourcefiles src/books_management \
               --html coverage/html \
               --xml coverage/jacoco.xml \
               --csv coverage/jacoco.csv
@@ -57,6 +58,9 @@ jobs:
             echo "JaCoCo execution data was not generated."
             exit 1
           fi
+      - name: Enforce minimum line coverage
+        if: success()
+        run: python3 scripts/check_coverage.py coverage/jacoco.xml 85
       - name: Upload test and coverage reports
         if: always()
         uses: actions/upload-artifact@v4
