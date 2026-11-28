@@ -39,7 +39,7 @@ jobs:
           mkdir -p out/main out/test
           javac -d out/main src/main.java src/books_management/*.java
           javac -cp "lib/junit-platform-console-standalone.jar:out/main" \
-            -d out/test tests/*.java tests/*.java
+            -d out/test tests/*.java
       - name: Run JUnit tests with JaCoCo instrumentation
         run: |
           java -javaagent:lib/jacocoagent.jar=destfile=coverage/jacoco.exec \
