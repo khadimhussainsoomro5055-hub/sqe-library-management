@@ -61,6 +61,17 @@ class LibraryCoreEdgeCasesTest {
     }
 
     @Test
+    void addBookRejectsAnObjectWhoseIsbnInvariantWasCorrupted() throws Exception {
+        books corrupted = new books(19, "9780134685991", "Corrupted ISBN", "Author", 1);
+        java.lang.reflect.Field isbn = books.class.getDeclaredField("isbn");
+        isbn.setAccessible(true);
+        isbn.set(corrupted, "not-a-valid-isbn");
+
+        assertFalse(books.addBook(corrupted));
+        assertEquals(0, books.totalAvailableCopies());
+    }
+
+    @Test
     void deprecatedCompatibilityAddMethodDelegatesToValidatedAdd() {
         books book = new books(16, "9780134685991", "Compatibility", "Author", 1);
         books.addBookWithoutDuplicateCheck(book);
@@ -122,6 +133,7 @@ class LibraryCoreEdgeCasesTest {
         java.lang.reflect.Field catalog = books.class.getDeclaredField("libraryBooks");
         catalog.setAccessible(true);
         ((java.util.List<?>) catalog.get(null)).clear();
+        LibraryTestFixture.addBook(20, "9780134685991", "Different Catalog Entry", "Author", 1);
 
         assertFalse(books.returnBook(17, "Ali"));
     }
