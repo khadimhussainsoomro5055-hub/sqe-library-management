@@ -63,6 +63,8 @@ jobs:
       - name: Enforce minimum line coverage
         if: success()
         run: python3 scripts/check_coverage.py coverage/jacoco.xml 85
+      - name: Run Lab 12 Spring Boot API tests
+        run: mvn -B -f libraryhub-api-java/pom.xml clean verify
       - name: Upload test and coverage reports
         if: always()
         uses: actions/upload-artifact@v4
