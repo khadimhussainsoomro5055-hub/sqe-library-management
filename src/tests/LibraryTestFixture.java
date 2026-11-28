@@ -1,3 +1,7 @@
+package tests;
+
+import books_management.books;
+
 public final class LibraryTestFixture {
 
     private LibraryTestFixture() {

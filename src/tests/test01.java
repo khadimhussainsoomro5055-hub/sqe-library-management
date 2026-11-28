@@ -1,3 +1,7 @@
+package tests;
+
+import books_management.books;
+
 public class test01 {
 
     private static int passed = 0;

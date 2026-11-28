@@ -1,4 +1,6 @@
 
+package books_management;
+
 public class LibraryIOError extends RuntimeException {
 
     public LibraryIOError(String message, Throwable cause) {

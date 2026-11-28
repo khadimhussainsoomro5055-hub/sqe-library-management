@@ -1,4 +1,6 @@
 
+package books_management;
+
 import java.io.IOException;
 
 public interface CatalogWriter {

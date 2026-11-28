@@ -1,4 +1,10 @@
 
+package tests;
+
+import books_management.CatalogWriter;
+import books_management.LibraryIOError;
+import books_management.books;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
