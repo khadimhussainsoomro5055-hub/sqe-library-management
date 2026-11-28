@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,18 +27,37 @@ jobs:
           java-version: '21'
       - name: Download JUnit 5
         run: |
-          mkdir -p lib
+          mkdir -p lib coverage
           curl -fL -o lib/junit-platform-console-standalone.jar \
             https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar
+          curl -fL -o lib/jacocoagent.jar \
+            https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-runtime.jar
+          curl -fL -o lib/jacococli.jar \
+            https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.cli/0.8.12/org.jacoco.cli-0.8.12-nodeps.jar
       - name: Compile application and tests
         run: |
-          mkdir -p out
-          javac -cp "lib/junit-platform-console-standalone.jar" \
-            -d out src/main.java src/books_management/*.java tests/*.java
-      - name: Run JUnit tests
+          mkdir -p out/main out/test
+          javac -d out/main src/main.java src/books_management/*.java
+          javac -cp "lib/junit-platform-console-standalone.jar:out/main" \
+            -d out/test tests/*.java
+      - name: Run JUnit tests with JaCoCo instrumentation
         run: |
-          java -jar lib/junit-platform-console-standalone.jar execute \
-            --class-path out --scan-class-path --details=summary
+          java -javaagent:lib/jacocoagent.jar=destfile=coverage/jacoco.exec \
+            -jar lib/junit-platform-console-standalone.jar execute \
+            --class-path "out/main:out/test" --scan-class-path --details=summary
+      - name: Generate JaCoCo reports
+        if: always()
+        run: |
+          java -jar lib/jacococli.jar report coverage/jacoco.exec \
+            --classfiles out/main --sourcefiles src --sourcefiles src/books_management \
+            --html coverage/html --xml coverage/jacoco.xml --csv coverage/jacoco.csv
+      - name: Upload baseline coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab11-original-baseline
+          path: coverage/
+          if-no-files-found: error
       - name: Upload test runtime artifacts
         if: always()
         uses: actions/upload-artifact@v4
