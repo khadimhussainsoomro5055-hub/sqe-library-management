@@ -86,6 +86,14 @@ public class main {
             System.out.println("Book not found.");
         }
 
+        // Exercise the negative search path as part of the demonstration.
+        books missingResult = books.searchBook("Book Not In Catalog");
+        if (missingResult != null) {
+            System.out.println("Unexpected book match: " + missingResult.getBook_Name());
+        } else {
+            System.out.println("Book not found.");
+        }
+
         // 6. Return book
         System.out.println("\n--- Return Book ---");
 
