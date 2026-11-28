@@ -89,11 +89,23 @@ jobs:
           java-version: '21'
       - name: Download JUnit 5 and compile
         run: |
-          mkdir -p lib out
+          mkdir -p lib out coverage
           curl -fL -o lib/junit-platform-console-standalone.jar \
             https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar
+          curl -fL -o lib/jacocoagent.jar \
+            https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-runtime.jar
+          curl -fL -o lib/jacococli.jar \
+            https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.cli/0.8.12/org.jacoco.cli-0.8.12-nodeps.jar
           javac -cp "lib/junit-platform-console-standalone.jar" \
             -d out src/main.java src/books_management/*.java tests/*.java
+      - name: Run tests and generate JaCoCo XML for SonarCloud
+        run: |
+          java -javaagent:lib/jacocoagent.jar=destfile=coverage/jacoco.exec,includes=books,Member,LibraryIOError,CatalogWriter,main \
+            -jar lib/junit-platform-console-standalone.jar execute \
+            --class-path out --scan-class-path --details=summary
+          java -jar lib/jacococli.jar report coverage/jacoco.exec \
+            --classfiles out --sourcefiles src --sourcefiles src/books_management \
+            --xml coverage/jacoco.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
