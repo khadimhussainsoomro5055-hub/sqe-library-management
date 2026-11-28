@@ -78,7 +78,17 @@ curl -i -X POST http://localhost:8080/books \
   -d '{"isbn":"9780132350885","author":"R. Martin","totalCopies":1}'
 ```
 
-## Actual execution evidence
+## Automated verification
+
+The REST Assured suite was executed against the real Spring Boot application on a random port in GitHub Actions run #5. All 26 automated tests passed after the schema correction. This confirms the six endpoint behaviours and the negative/boundary cases through HTTP requests.
+
+- Workflow: https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46140694341
+- Test report artifact: `lab12-junit-reports` (artifact ID `15261144675`)
+- Schema defect: [issue #33](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/issues/33), fixed by excluding the internal `totalCopies` property from JSON serialization.
+
+## Local manual execution evidence still required
+
+Automated integration tests are not a substitute for the handout's manual curl/Postman exploration. Before final submission:
 
 - [ ] Run all six endpoint requests locally and replace the expected examples with actual response bodies.
 - [ ] Run both invalid requests and record the actual error response.
