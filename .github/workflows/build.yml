@@ -2,7 +2,7 @@ name: Java Tests and SonarCloud
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'feature/**']
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
