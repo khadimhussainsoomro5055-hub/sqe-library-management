@@ -20,8 +20,15 @@ public class DuplicateBorrowingTest {
     }
     @Test void memberCanBorrowAgainAfterReturningBook() {
         assertTrue(books.issueBook(701, "Ali"));
+        assertEquals(2, books.searchBook("Effective Java").getBook_Quantity());
+        assertEquals(1, books.getMemberBorrowedCount("Ali"));
+
         assertTrue(books.returnBook(701, "Ali"));
+        assertEquals(3, books.searchBook("Effective Java").getBook_Quantity());
+        assertEquals(0, books.getMemberBorrowedCount("Ali"));
+
         assertTrue(books.issueBook(701, "Ali"));
+        assertEquals(2, books.searchBook("Effective Java").getBook_Quantity());
         assertEquals(1, books.getMemberBorrowedCount("Ali"));
     }
 }
