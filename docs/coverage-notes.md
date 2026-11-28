@@ -69,20 +69,20 @@ The threshold is enforced in the Java CI workflow rather than adding Python tool
 
 | Metric | Baseline | Final verified run |
 |---|---:|---:|
-| Line coverage | 68.24% (159/233) | 98.31% (233/237) |
-| Branch coverage | 71.64% (96/134) | 96.32% (131/136) |
-| JUnit tests passed | 84 | 101 |
+| Line coverage | 68.24% (159/233) | 99.58% (235/236) |
+| Branch coverage | 71.64% (96/134) | 98.51% (132/134) |
+| JUnit tests passed | 84 | 102 |
 | JUnit tests failed | 0 | 0 |
 | 85% line threshold | Not enforced in baseline | Passed |
 
-The final figures above are from the verified JaCoCo run after the production/test class separation. A later commit adds a small number of further branch tests and the search-result helper refactor; the newest run must replace these figures if its report differs.
+The final figures above are from verified GitHub Actions run #55. The report shows one uncovered non-executable closing-brace line in `books.java`; the two remaining branches were defensive ISBN revalidation and a nonmatching catalog scan in the return path. A follow-up branch adds targeted tests for those defensive paths; update these figures from that run if it succeeds.
 
 ## Evidence
 
 - Baseline report artifact: GitHub Actions run #44, artifact `lab11-original-baseline`.
-- Final report artifact: GitHub Actions run #43, artifact `lab11-coverage-baseline`.
+- Final report artifact: GitHub Actions run #55, artifact `lab11-coverage-baseline` (artifact ID 15261506660).
 - Each artifact contains `coverage/html/index.html`, `coverage/jacoco.xml`, `coverage/jacoco.csv` and execution data.
-- [Final workflow run](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46139525343)
+- [Final workflow run](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46139757051)
 - [Baseline workflow run](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46139534446)
 
 ## Screenshot checklist
