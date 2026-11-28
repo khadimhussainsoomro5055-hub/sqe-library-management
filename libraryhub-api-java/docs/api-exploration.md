@@ -1,34 +1,14 @@
-# LibraryHub API — Manual Exploration Log
+# LibraryHub API — Manual API Requests
 
-**Environment:** Spring Boot 3.x, Java 17+, localhost:8080  
-**Purpose:** Perform the manual exploration required by Lab 12 before relying on the automated REST Assured tests.
-
-## Start the API
-
-From the `libraryhub-api-java` directory:
+This document contains sample requests for checking the LibraryHub API locally. Start the application before sending the requests:
 
 ```bash
 mvn spring-boot:run
 ```
 
-Keep the application terminal open. Run the requests below in a second terminal or import them into Postman.
+The server listens on `http://localhost:8080`.
 
-## Request and response record
-
-The response examples below are the API contract examples derived from the implementation. Replace the **Actual response** column with the response captured from your own local run before final submission. Do not report these examples as personally captured terminal output.
-
-| # | Method and path | Request body / query | Expected status | Expected response |
-|---|---|---|---:|---|
-| 1 | POST /books | `{"title":"Clean Code","isbn":"9780132350884","author":"R. Martin","totalCopies":1}` | 201 | Book JSON with title, isbn, author and availableCopies=1 |
-| 2 | GET /books | None | 200 | JSON array containing the created book |
-| 3 | GET /books/9780132350884 | None | 200 | JSON for Clean Code |
-| 4 | POST /members/501/borrow | `{"isbn":"9780132350884"}` | 200 | `{"isbn":"9780132350884","availableCopies":0}` |
-| 5 | POST /members/501/return | `{"isbn":"9780132350884"}` | 200 | `{"isbn":"9780132350884","availableCopies":1}` |
-| 6 | GET /members/501/fines?daysOverdue=15 | None | 200 | `{"memberId":501,"daysOverdue":15,"tier":"High"}` |
-| 7 | GET /books/0000000000000 | None | 404 | `{"error":"Unknown ISBN: 0000000000000"}` |
-| 8 | POST /books (missing title) | `{"isbn":"9780132350885","author":"R. Martin","totalCopies":1}` | 400 | `{"error":"title is required"}` |
-
-## curl commands
+## Requests
 
 ### Add a book
 
@@ -38,59 +18,66 @@ curl -i -X POST http://localhost:8080/books \
   -d '{"title":"Clean Code","isbn":"9780132350884","author":"R. Martin","totalCopies":1}'
 ```
 
-### List books
+### List all books
 
 ```bash
 curl -i http://localhost:8080/books
 ```
 
-### Get a book by ISBN
+### Find a book by ISBN
 
 ```bash
 curl -i http://localhost:8080/books/9780132350884
 ```
 
-### Borrow and return
+### Borrow a book
 
 ```bash
 curl -i -X POST http://localhost:8080/members/501/borrow \
   -H "Content-Type: application/json" \
   -d '{"isbn":"9780132350884"}'
+```
 
+### Return a book
+
+```bash
 curl -i -X POST http://localhost:8080/members/501/return \
   -H "Content-Type: application/json" \
   -d '{"isbn":"9780132350884"}'
 ```
 
-### Fine tier
+### Check a fine tier
 
 ```bash
 curl -i "http://localhost:8080/members/501/fines?daysOverdue=15"
 ```
 
-### Deliberately invalid requests
+### Invalid requests
+
+Find a book using an ISBN that does not exist:
 
 ```bash
 curl -i http://localhost:8080/books/0000000000000
+```
 
+Try to add a book without its title:
+
+```bash
 curl -i -X POST http://localhost:8080/books \
   -H "Content-Type: application/json" \
   -d '{"isbn":"9780132350885","author":"R. Martin","totalCopies":1}'
 ```
 
-## Automated verification
+## Recording results
 
-The REST Assured suite was executed against the real Spring Boot application on a random port in GitHub Actions run #5. All 26 automated tests passed after the schema correction. This confirms the six endpoint behaviours and the negative/boundary cases through HTTP requests.
+For each request, record the HTTP status and response body returned by your local run. The output may be copied into the lab report, and screenshots can be taken from the terminal or Postman. Keep the actual output from your run; do not use sample output as captured evidence.
 
-- Workflow: https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46140694341
-- Test report artifact: `lab12-junit-reports` (artifact ID `15261144675`)
-- Schema defect: [issue #33](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/issues/33), fixed by excluding the internal `totalCopies` property from JSON serialization.
+## Automated tests
 
-## Local manual execution evidence still required
+Run the automated tests from this directory:
 
-Automated integration tests are not a substitute for the handout's manual curl/Postman exploration. Before final submission:
+```bash
+mvn test
+```
 
-- [ ] Run all six endpoint requests locally and replace the expected examples with actual response bodies.
-- [ ] Run both invalid requests and record the actual error response.
-- [ ] Capture terminal or Postman screenshots for the Word submission.
-- [ ] Record any unexpected response and link its GitHub issue.
+The tests cover successful requests, invalid requests, fine-tier boundaries, the book response schema and response time.
