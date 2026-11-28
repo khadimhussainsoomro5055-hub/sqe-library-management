@@ -77,22 +77,11 @@ public class main {
             "java programming"
         );
 
-        if (result != null) {
-            System.out.println(
-                "Book found: "
-                + result.getBook_Name()
-            );
-        } else {
-            System.out.println("Book not found.");
-        }
+        displaySearchResult(result);
 
         // Exercise the negative search path as part of the demonstration.
         books missingResult = books.searchBook("Book Not In Catalog");
-        if (missingResult != null) {
-            System.out.println("Unexpected book match: " + missingResult.getBook_Name());
-        } else {
-            System.out.println("Book not found.");
-        }
+        displaySearchResult(missingResult);
 
         // 6. Return book
         System.out.println("\n--- Return Book ---");
@@ -131,3 +120,11 @@ public class main {
         System.out.println("\n=== Program Finished ===");
     }
 }
+
+    static void displaySearchResult(books result) {
+        if (result != null) {
+            System.out.println("Book found: " + result.getBook_Name());
+        } else {
+            System.out.println("Book not found.");
+        }
+    }
