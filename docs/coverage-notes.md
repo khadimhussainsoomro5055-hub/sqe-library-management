@@ -69,26 +69,26 @@ The threshold is enforced in the Java CI workflow rather than adding Python tool
 
 | Metric | Baseline | Final verified run |
 |---|---:|---:|
-| Line coverage | 68.24% (159/233) | 98.31% (233/237) |
-| Branch coverage | 71.64% (96/134) | 96.32% (131/136) |
-| JUnit tests passed | 84 | 101 |
+| Line coverage | 68.24% (159/233) | 100.00% (236/236) |
+| Branch coverage | 71.64% (96/134) | 100.00% (134/134) |
+| JUnit tests passed | 84 | 103 |
 | JUnit tests failed | 0 | 0 |
 | 85% line threshold | Not enforced in baseline | Passed |
 
-The final figures above are from the verified JaCoCo run after the production/test class separation. A later commit adds a small number of further branch tests and the search-result helper refactor; the newest run must replace these figures if its report differs.
+The final figures above are from verified GitHub Actions run #61. The follow-up tests exercise defensive ISBN revalidation and a nonmatching catalog entry during the return scan. JaCoCo now reports every production line and branch covered.
 
 ## Evidence
 
 - Baseline report artifact: GitHub Actions run #44, artifact `lab11-original-baseline`.
-- Final report artifact: GitHub Actions run #43, artifact `lab11-coverage-baseline`.
+- Final report artifact: GitHub Actions run #61, artifact `lab11-coverage-baseline` (artifact ID 15260802750).
 - Each artifact contains `coverage/html/index.html`, `coverage/jacoco.xml`, `coverage/jacoco.csv` and execution data.
-- [Final workflow run](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46139525343)
+- [Final workflow run](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46139908149)
 - [Baseline workflow run](https://github.com/khadimhussainsoomro5055-hub/sqe-library-management/actions/runs/46139534446)
 
 ## Screenshot checklist
 
 - [ ] Capture the baseline JaCoCo HTML summary table from the downloaded baseline artifact.
-- [ ] Capture the final JaCoCo HTML summary table from the downloaded final artifact after the latest test commit.
+- [ ] Capture the final JaCoCo HTML summary table from the downloaded final artifact.
 - [ ] Attach both images to the lab submission.
 
 Screenshots must come from the actual JaCoCo HTML reports. No synthetic terminal output or estimated coverage screenshot should be submitted.
