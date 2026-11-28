@@ -36,20 +36,21 @@ jobs:
             https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.cli/0.8.12/org.jacoco.cli-0.8.12-nodeps.jar
       - name: Compile application and tests
         run: |
-          mkdir -p out
-          javac -cp "lib/junit-platform-console-standalone.jar" \
-            -d out src/main.java src/books_management/*.java tests/*.java
+          mkdir -p out/main out/test
+          javac -d out/main src/main.java src/books_management/*.java
+          javac -cp "lib/junit-platform-console-standalone.jar:out/main" \
+            -d out/test tests/*.java tests/*.java
       - name: Run JUnit tests with JaCoCo instrumentation
         run: |
-          java -javaagent:lib/jacocoagent.jar=destfile=coverage/jacoco.exec,includes=books,Member,LibraryIOError,CatalogWriter,main \
+          java -javaagent:lib/jacocoagent.jar=destfile=coverage/jacoco.exec \
             -jar lib/junit-platform-console-standalone.jar execute \
-            --class-path out --scan-class-path --details=summary
+            --class-path "out/main:out/test" --scan-class-path --details=summary
       - name: Generate HTML, XML and CSV coverage reports
         if: always()
         run: |
           if [ -f coverage/jacoco.exec ]; then
             java -jar lib/jacococli.jar report coverage/jacoco.exec \
-              --classfiles out \
+              --classfiles out/main \
               --sourcefiles src \
               --sourcefiles src/books_management \
               --html coverage/html \
@@ -96,15 +97,17 @@ jobs:
             https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-runtime.jar
           curl -fL -o lib/jacococli.jar \
             https://repo.maven.apache.org/maven2/org/jacoco/org.jacoco.cli/0.8.12/org.jacoco.cli-0.8.12-nodeps.jar
-          javac -cp "lib/junit-platform-console-standalone.jar" \
-            -d out src/main.java src/books_management/*.java tests/*.java
+          mkdir -p out/main out/test
+          javac -d out/main src/main.java src/books_management/*.java
+          javac -cp "lib/junit-platform-console-standalone.jar:out/main" \
+            -d out/test tests/*.java
       - name: Run tests and generate JaCoCo XML for SonarCloud
         run: |
-          java -javaagent:lib/jacocoagent.jar=destfile=coverage/jacoco.exec,includes=books,Member,LibraryIOError,CatalogWriter,main \
+          java -javaagent:lib/jacocoagent.jar=destfile=coverage/jacoco.exec \
             -jar lib/junit-platform-console-standalone.jar execute \
-            --class-path out --scan-class-path --details=summary
+            --class-path "out/main:out/test" --scan-class-path --details=summary
           java -jar lib/jacococli.jar report coverage/jacoco.exec \
-            --classfiles out --sourcefiles src --sourcefiles src/books_management \
+            --classfiles out/main --sourcefiles src --sourcefiles src/books_management \
             --xml coverage/jacoco.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5
