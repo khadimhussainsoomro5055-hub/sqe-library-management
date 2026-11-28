@@ -127,6 +127,15 @@ class LibraryCoreEdgeCasesTest {
     }
 
     @Test
+    void borrowedCountIgnoresMalformedInternalLoanRecords() throws Exception {
+        java.lang.reflect.Field recordsField = books.class.getDeclaredField("issuedBooks");
+        recordsField.setAccessible(true);
+        ((java.util.List<String>) recordsField.get(null)).add("malformed-record");
+
+        assertEquals(0, books.getMemberBorrowedCount("Ali"));
+    }
+
+    @Test
     void searchReturnsNullWhenNoTitleMatches() {
         LibraryTestFixture.addBook(18, "9780133943030", "Known Title", "Author", 1);
         assertNull(books.searchBook("Missing Title"));
